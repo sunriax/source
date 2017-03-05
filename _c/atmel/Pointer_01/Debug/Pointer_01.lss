@@ -1,0 +1,168 @@
+
+Pointer_01.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000010c  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  00000180  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000007  00800060  00800060  00000180  2**0
+                  ALLOC
+  3 .comment      00000030  00000000  00000000  00000180  2**0
+                  CONTENTS, READONLY
+  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000001b0  2**2
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000020  00000000  00000000  000001ec  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   000000e2  00000000  00000000  0000020c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 00000085  00000000  00000000  000002ee  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   000000f7  00000000  00000000  00000373  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  00000034  00000000  00000000  0000046c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    00000161  00000000  00000000  000004a0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    0000003b  00000000  00000000  00000601  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 00000010  00000000  00000000  0000063c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+   8:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+   c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  10:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  14:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  18:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  1c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  20:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  24:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  28:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  2c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  30:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  34:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  38:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  3c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  40:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  44:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  48:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  4c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  50:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d4 e0       	ldi	r29, 0x04	; 4
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+
+00000060 <__do_clear_bss>:
+  60:	20 e0       	ldi	r18, 0x00	; 0
+  62:	a0 e6       	ldi	r26, 0x60	; 96
+  64:	b0 e0       	ldi	r27, 0x00	; 0
+  66:	01 c0       	rjmp	.+2      	; 0x6a <.do_clear_bss_start>
+
+00000068 <.do_clear_bss_loop>:
+  68:	1d 92       	st	X+, r1
+
+0000006a <.do_clear_bss_start>:
+  6a:	a7 36       	cpi	r26, 0x67	; 103
+  6c:	b2 07       	cpc	r27, r18
+  6e:	e1 f7       	brne	.-8      	; 0x68 <.do_clear_bss_loop>
+  70:	0e 94 3e 00 	call	0x7c	; 0x7c <main>
+  74:	0c 94 84 00 	jmp	0x108	; 0x108 <_exit>
+
+00000078 <__bad_interrupt>:
+  78:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000007c <main>:
+volatile unsigned char *px, x; // Pointer px und Variable x vereinbaren
+volatile unsigned int *ptri;   // Pointer für direkte Adressierung vereinbaren
+volatile unsigned char *ptr;   // Pointer für SFR vereinbaren
+
+int main(void)
+{
+  7c:	cf 93       	push	r28
+  7e:	df 93       	push	r29
+  80:	cd b7       	in	r28, 0x3d	; 61
+  82:	de b7       	in	r29, 0x3e	; 62
+	DDRC=0xFF; // LED-Port (PortC) als Ausgang konfigurieren
+  84:	84 e3       	ldi	r24, 0x34	; 52
+  86:	90 e0       	ldi	r25, 0x00	; 0
+  88:	2f ef       	ldi	r18, 0xFF	; 255
+  8a:	fc 01       	movw	r30, r24
+  8c:	20 83       	st	Z, r18
+	ptri = 0x0070;	// Pointer direkt initialisieren (Inhalt = Adresse 0x70 im SRAM)
+  8e:	80 e7       	ldi	r24, 0x70	; 112
+  90:	90 e0       	ldi	r25, 0x00	; 0
+  92:	90 93 64 00 	sts	0x0064, r25	; 0x800064 <ptri+0x1>
+  96:	80 93 63 00 	sts	0x0063, r24	; 0x800063 <ptri>
+                    // nur für Demo-Zwecke - MIT VORSICHT VERWENDEN!!!
+   while(1)
+   {
+	  px = &x; // Pointer px auf variable x setzen  (Referenzierung) 
+  9a:	80 e6       	ldi	r24, 0x60	; 96
+  9c:	90 e0       	ldi	r25, 0x00	; 0
+  9e:	90 93 66 00 	sts	0x0066, r25	; 0x800066 <px+0x1>
+  a2:	80 93 65 00 	sts	0x0065, r24	; 0x800065 <px>
+	           // -> px referenziert auf Adresse der Variable x 
+			     //    oder einfacher: px "zeigt" auf x
+	  
+	  *px = 0xBA;  // Wert von x über Pointer px ändern (Dereferenzierung)
+  a6:	80 91 65 00 	lds	r24, 0x0065	; 0x800065 <px>
+  aa:	90 91 66 00 	lds	r25, 0x0066	; 0x800066 <px+0x1>
+  ae:	2a eb       	ldi	r18, 0xBA	; 186
+  b0:	fc 01       	movw	r30, r24
+  b2:	20 83       	st	Z, r18
+	  PORTC = *px;	// Wert von x auf PortC ausgeben
+  b4:	85 e3       	ldi	r24, 0x35	; 53
+  b6:	90 e0       	ldi	r25, 0x00	; 0
+  b8:	20 91 65 00 	lds	r18, 0x0065	; 0x800065 <px>
+  bc:	30 91 66 00 	lds	r19, 0x0066	; 0x800066 <px+0x1>
+  c0:	f9 01       	movw	r30, r18
+  c2:	20 81       	ld	r18, Z
+  c4:	fc 01       	movw	r30, r24
+  c6:	20 83       	st	Z, r18
+
+	  ptr = &PORTC; // Pointer auf Portvariable (SFR) setzen
+  c8:	85 e3       	ldi	r24, 0x35	; 53
+  ca:	90 e0       	ldi	r25, 0x00	; 0
+  cc:	90 93 62 00 	sts	0x0062, r25	; 0x800062 <ptr+0x1>
+  d0:	80 93 61 00 	sts	0x0061, r24	; 0x800061 <ptr>
+	  *ptr = 0xCC;	 // Ausgabe des Wertes 0xCC auf PortC
+  d4:	80 91 61 00 	lds	r24, 0x0061	; 0x800061 <ptr>
+  d8:	90 91 62 00 	lds	r25, 0x0062	; 0x800062 <ptr+0x1>
+  dc:	2c ec       	ldi	r18, 0xCC	; 204
+  de:	fc 01       	movw	r30, r24
+  e0:	20 83       	st	Z, r18
+
+	  *ptri=0xFEDC; // SRAM Adressen 0x70/0x71 mit Wert 0xFEDC beschreiben
+  e2:	80 91 63 00 	lds	r24, 0x0063	; 0x800063 <ptri>
+  e6:	90 91 64 00 	lds	r25, 0x0064	; 0x800064 <ptri+0x1>
+  ea:	2c ed       	ldi	r18, 0xDC	; 220
+  ec:	3e ef       	ldi	r19, 0xFE	; 254
+  ee:	fc 01       	movw	r30, r24
+  f0:	31 83       	std	Z+1, r19	; 0x01
+  f2:	20 83       	st	Z, r18
+	  ptri++;		 // Pointer auf nächste Integer-Speicherstelle setzen 
+  f4:	80 91 63 00 	lds	r24, 0x0063	; 0x800063 <ptri>
+  f8:	90 91 64 00 	lds	r25, 0x0064	; 0x800064 <ptri+0x1>
+  fc:	02 96       	adiw	r24, 0x02	; 2
+  fe:	90 93 64 00 	sts	0x0064, r25	; 0x800064 <ptri+0x1>
+ 102:	80 93 63 00 	sts	0x0063, r24	; 0x800063 <ptri>
+	                // (-> Adresse wird um 2 erhöht)	
+   }
+ 106:	c9 cf       	rjmp	.-110    	; 0x9a <main+0x1e>
+
+00000108 <_exit>:
+ 108:	f8 94       	cli
+
+0000010a <__stop_program>:
+ 10a:	ff cf       	rjmp	.-2      	; 0x10a <__stop_program>

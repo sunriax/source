@@ -1,0 +1,206 @@
+
+SPI_3Draht_01.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000f0  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  00000164  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000001  00800060  00800060  00000164  2**0
+                  ALLOC
+  3 .comment      00000030  00000000  00000000  00000164  2**0
+                  CONTENTS, READONLY
+  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000194  2**2
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000030  00000000  00000000  000001d0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   0000016f  00000000  00000000  00000200  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 00000116  00000000  00000000  0000036f  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   000001ad  00000000  00000000  00000485  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  00000044  00000000  00000000  00000634  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    000001d0  00000000  00000000  00000678  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    00000073  00000000  00000000  00000848  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 00000020  00000000  00000000  000008bb  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+   8:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+   c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  10:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  14:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  18:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  1c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  20:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  24:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  28:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  2c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  30:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  34:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  38:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  3c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  40:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  44:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  48:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  4c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  50:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d4 e0       	ldi	r29, 0x04	; 4
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+
+00000060 <__do_clear_bss>:
+  60:	20 e0       	ldi	r18, 0x00	; 0
+  62:	a0 e6       	ldi	r26, 0x60	; 96
+  64:	b0 e0       	ldi	r27, 0x00	; 0
+  66:	01 c0       	rjmp	.+2      	; 0x6a <.do_clear_bss_start>
+
+00000068 <.do_clear_bss_loop>:
+  68:	1d 92       	st	X+, r1
+
+0000006a <.do_clear_bss_start>:
+  6a:	a1 36       	cpi	r26, 0x61	; 97
+  6c:	b2 07       	cpc	r27, r18
+  6e:	e1 f7       	brne	.-8      	; 0x68 <.do_clear_bss_loop>
+  70:	0e 94 67 00 	call	0xce	; 0xce <main>
+  74:	0c 94 76 00 	jmp	0xec	; 0xec <_exit>
+
+00000078 <__bad_interrupt>:
+  78:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000007c <SPI_Init>:
+#define SPI_SCK   PB7	// SPI Takt
+
+// SPI Initialisierungsroutine
+void SPI_Init(void)
+{ 
+	SPI_DDR |= (1<<SPI_SCK) | (1<<SPI_MOSI) | (1<<SPI_MISO);	// Clock, MOSI, MISO also Ausgang
+  7c:	87 b3       	in	r24, 0x17	; 23
+  7e:	80 6e       	ori	r24, 0xE0	; 224
+  80:	87 bb       	out	0x17, r24	; 23
+	SPI_PORT = (1<<SPI_SS) | (1<<SPI_MISO);						// Pullup an Slave Select und MISO aktivieren
+  82:	80 e5       	ldi	r24, 0x50	; 80
+  84:	88 bb       	out	0x18, r24	; 24
+																// Wenn SS auf LOW System in Slave-Betriebsart
+																// Wenn SS auf HIGH System in Master-Betriebsart
+
+	SPSR = (1<<SPI2X);											// Double Speed Mode aktivieren
+  86:	81 e0       	ldi	r24, 0x01	; 1
+  88:	8e b9       	out	0x0e, r24	; 14
+	SPCR = (1<<MSTR) | (1<<SPE) | (1<<SPR1);					// Master Betriebsart ein
+  8a:	82 e5       	ldi	r24, 0x52	; 82
+  8c:	8d b9       	out	0x0d, r24	; 13
+  8e:	08 95       	ret
+
+00000090 <SPI_Transfer>:
+// SPI Transferroutine
+unsigned char SPI_Transfer (unsigned char Data_Tx)
+{ 
+	static unsigned char Data_Rx;								// Funktionsvariable anlegen
+ 
+	if (SPCR & (1<<MSTR))										// Wenn Master aktiv
+  90:	6c 9b       	sbis	0x0d, 4	; 13
+  92:	06 c0       	rjmp	.+12     	; 0xa0 <SPI_Transfer+0x10>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  94:	e7 eb       	ldi	r30, 0xB7	; 183
+  96:	fb e0       	ldi	r31, 0x0B	; 11
+  98:	31 97       	sbiw	r30, 0x01	; 1
+  9a:	f1 f7       	brne	.-4      	; 0x98 <SPI_Transfer+0x8>
+  9c:	00 c0       	rjmp	.+0      	; 0x9e <SPI_Transfer+0xe>
+  9e:	00 00       	nop
+		_delay_ms(1);											// Verzögerung um 1ms
+	
+	SPDR = Data_Tx;												// Daten auf SPI Datenregister schreiben
+  a0:	8f b9       	out	0x0f, r24	; 15
+  
+	while (!(SPSR & (1<<SPIF)))									// Warten solange SPIF 0
+  a2:	77 99       	sbic	0x0e, 7	; 14
+  a4:	03 c0       	rjmp	.+6      	; 0xac <SPI_Transfer+0x1c>
+		asm volatile ("nop");									// NO OPERATION
+  a6:	00 00       	nop
+	if (SPCR & (1<<MSTR))										// Wenn Master aktiv
+		_delay_ms(1);											// Verzögerung um 1ms
+	
+	SPDR = Data_Tx;												// Daten auf SPI Datenregister schreiben
+  
+	while (!(SPSR & (1<<SPIF)))									// Warten solange SPIF 0
+  a8:	77 9b       	sbis	0x0e, 7	; 14
+  aa:	fd cf       	rjmp	.-6      	; 0xa6 <SPI_Transfer+0x16>
+		asm volatile ("nop");									// NO OPERATION
+
+	if (SPSR & (1<<WCOL))										// Wenn Kollision aufgetreten
+  ac:	76 9b       	sbis	0x0e, 6	; 14
+  ae:	05 c0       	rjmp	.+10     	; 0xba <SPI_Transfer+0x2a>
+		Data_Rx |= 0x80;										// Sticky-Bit aktivieren
+  b0:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <_edata>
+  b4:	80 68       	ori	r24, 0x80	; 128
+  b6:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <_edata>
+ 
+	Data_Rx = (Data_Rx&0x80) | (SPDR&0x7F);						// Empfangende Daten auf  in DatenRX speichern
+  ba:	8f b1       	in	r24, 0x0f	; 15
+  bc:	98 2f       	mov	r25, r24
+  be:	9f 77       	andi	r25, 0x7F	; 127
+  c0:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <_edata>
+  c4:	80 78       	andi	r24, 0x80	; 128
+  c6:	89 2b       	or	r24, r25
+  c8:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <_edata>
+	
+	return Data_Rx;												// Rückgabe von Data RX
+}
+  cc:	08 95       	ret
+
+000000ce <main>:
+
+// Hauptprogramm
+int main(void) 
+{
+	DDRC  = 0xFF;	// DDRC Ausgang
+  ce:	8f ef       	ldi	r24, 0xFF	; 255
+  d0:	84 bb       	out	0x14, r24	; 20
+	PORTC = 0x00;	// PORTC auf LOW
+  d2:	15 ba       	out	0x15, r1	; 21
+	DDRA  = 0x00;	// DDRA als Eingang
+  d4:	1a ba       	out	0x1a, r1	; 26
+	PORTA = 0x0F;	// Pullups aktivieren
+  d6:	8f e0       	ldi	r24, 0x0F	; 15
+  d8:	8b bb       	out	0x1b, r24	; 27
+	
+	SPI_Init();		// Initialisierung aufrufen
+  da:	0e 94 3e 00 	call	0x7c	; 0x7c <SPI_Init>
+ 
+	//Endlosschleife
+	while(1)
+	{
+		PORTC = SPI_Transfer(~PINA&0x0F);	// Ausgabe von Empfangenen Daten und Senden von PINA
+  de:	89 b3       	in	r24, 0x19	; 25
+  e0:	80 95       	com	r24
+  e2:	8f 70       	andi	r24, 0x0F	; 15
+  e4:	0e 94 48 00 	call	0x90	; 0x90 <SPI_Transfer>
+  e8:	85 bb       	out	0x15, r24	; 21
+	} 
+  ea:	f9 cf       	rjmp	.-14     	; 0xde <main+0x10>
+
+000000ec <_exit>:
+  ec:	f8 94       	cli
+
+000000ee <__stop_program>:
+  ee:	ff cf       	rjmp	.-2      	; 0xee <__stop_program>

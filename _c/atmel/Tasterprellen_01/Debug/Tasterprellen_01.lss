@@ -1,0 +1,107 @@
+
+Tasterprellen_01.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000098  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  000000ec  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  000000ec  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  0000011c  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000020  00000000  00000000  00000158  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000087  00000000  00000000  00000178  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 00000053  00000000  00000000  000001ff  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000000c9  00000000  00000000  00000252  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000024  00000000  00000000  0000031c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000162  00000000  00000000  00000340  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_ranges 00000010  00000000  00000000  000004a2  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d4 e0       	ldi	r29, 0x04	; 4
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 36 00 	call	0x6c	; 0x6c <main>
+  64:	0c 94 4a 00 	jmp	0x94	; 0x94 <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <main>:
+#define TASTER PA3	// zu überprüfender Taster  
+                   
+int main(void)
+{
+ 
+  DDRA=0x00;	// Datenrichtungsregister A auf Eingang setzen
+  6c:	1a ba       	out	0x1a, r1	; 26
+  PORTA=0x0F;	// Pullups für Taster S0...3, unteres Nibble von PortA
+  6e:	8f e0       	ldi	r24, 0x0F	; 15
+  70:	8b bb       	out	0x1b, r24	; 27
+  DDRC=0xFF;	// Datenrichtungsregister C auf Ausgang setzen
+  72:	8f ef       	ldi	r24, 0xFF	; 255
+  74:	84 bb       	out	0x14, r24	; 20
+  PORTC=0x01;	// Led(0) ein, Rest aus (PORTC(0) auf HIGH (logisch 1) setzen)
+  76:	81 e0       	ldi	r24, 0x01	; 1
+  78:	85 bb       	out	0x15, r24	; 21
+  
+  while(1) {								// Endlosschleife
+    if (!(PINA & (1<<TASTER))) {			// Abfrage TASTER S0 (PA0) gedrückt wenn ja Code ausführen
+  7a:	cb 99       	sbic	0x19, 3	; 25
+  7c:	fe cf       	rjmp	.-4      	; 0x7a <main+0xe>
+	  PORTC = (PORTC<<1) | (PORTC>>7);		// LED-Status um 1 Bit nach links rotieren
+  7e:	95 b3       	in	r25, 0x15	; 21
+  80:	85 b3       	in	r24, 0x15	; 21
+  82:	99 0f       	add	r25, r25
+  84:	88 1f       	adc	r24, r24
+  86:	88 27       	eor	r24, r24
+  88:	88 1f       	adc	r24, r24
+  8a:	89 2b       	or	r24, r25
+  8c:	85 bb       	out	0x15, r24	; 21
+		while(!(PINA & (1<<TASTER)));			// Schleife solange S0 gedrückt
+  8e:	cb 9b       	sbis	0x19, 3	; 25
+  90:	fe cf       	rjmp	.-4      	; 0x8e <main+0x22>
+  92:	f3 cf       	rjmp	.-26     	; 0x7a <main+0xe>
+
+00000094 <_exit>:
+  94:	f8 94       	cli
+
+00000096 <__stop_program>:
+  96:	ff cf       	rjmp	.-2      	; 0x96 <__stop_program>

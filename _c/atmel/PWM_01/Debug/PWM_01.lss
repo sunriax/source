@@ -1,0 +1,222 @@
+
+PWM_01.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000e6  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  0000013a  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  0000013a  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  0000016c  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000020  00000000  00000000  000001a8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000087  00000000  00000000  000001c8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 00000053  00000000  00000000  0000024f  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   00000143  00000000  00000000  000002a2  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000024  00000000  00000000  000003e8  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000158  00000000  00000000  0000040c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_ranges 00000010  00000000  00000000  00000564  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d4 e0       	ldi	r29, 0x04	; 4
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 36 00 	call	0x6c	; 0x6c <main>
+  64:	0c 94 71 00 	jmp	0xe2	; 0xe2 <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <main>:
+#define OUTPUT PORTC	// Output Port
+
+
+int main(void)
+{
+	DDRTIM = (1<<PB3);	// PORTx auf Ausgang (OC0 Pin auf Ausgang)
+  6c:	88 e0       	ldi	r24, 0x08	; 8
+  6e:	87 bb       	out	0x17, r24	; 23
+	DDROUT = HIGH;		// PORTx auf Ausgang (LED Port auf Ausgang)
+  70:	8f ef       	ldi	r24, 0xFF	; 255
+  72:	84 bb       	out	0x14, r24	; 20
+	DDRIN  = LOW;		// PORTx auf Eingang (Taster Port auf Eingang)
+  74:	1a ba       	out	0x1a, r1	; 26
+
+	INPULL = HIGH;		// PORTx (Tasterport) Pullups aktiv
+  76:	8b bb       	out	0x1b, r24	; 27
+
+	TCCR0 = (1<<WGM00) | (1<<COM01);	// Timer Betriebsart Phasenrichtig PWM;
+  78:	80 e6       	ldi	r24, 0x60	; 96
+  7a:	83 bf       	out	0x33, r24	; 51
+	OCR0 = 128;							// Tastverhältnis auf 50% Setzen
+  7c:	80 e8       	ldi	r24, 0x80	; 128
+  7e:	8c bf       	out	0x3c, r24	; 60
+			/*	Mit Analog Discovery gemessen
+				T: 2,72ms (2,45ms HIGH) ~367,66 Hz	90,07% Pulsweite		*/
+			}
+			else
+			{
+				OCR0 = 128;			// Tastverhältnis auf 50% ((50/256) * 100%) = 128
+  80:	30 e8       	ldi	r19, 0x80	; 128
+		}
+		else
+		{
+			if(!(INPUT & (1<<PA3)))	// Prüfen ob Taster S3 gedrückt
+			{
+				OCR0 = 230;			// Tastverhältnis auf 10% ((90/256) * 100%) = 230
+  82:	26 ee       	ldi	r18, 0xE6	; 230
+			
+		}
+		
+		if(!(INPUT & (1<<PA2)))		// Prüfen ob Taster S2 gedrückt
+		{
+		OCR0 = 26;					// Tastverhältnis auf 10% ((10/256) * 100%) = 26
+  84:	9a e1       	ldi	r25, 0x1A	; 26
+	TCCR0 = (1<<WGM00) | (1<<COM01);	// Timer Betriebsart Phasenrichtig PWM;
+	OCR0 = 128;							// Tastverhältnis auf 50% Setzen
+
+    while (1) 
+    {
+		if(!(INPUT & (1<<PA0)))		// Prüfen ob Taster S0 gedrückt
+  86:	c8 99       	sbic	0x19, 0	; 25
+  88:	0b c0       	rjmp	.+22     	; 0xa0 <main+0x34>
+		{
+			TCCR0 |= (1<<CS01);						// Zähler mit Teilungsfaktor 8 (2941 Hz) Starten
+  8a:	83 b7       	in	r24, 0x33	; 51
+  8c:	82 60       	ori	r24, 0x02	; 2
+  8e:	83 bf       	out	0x33, r24	; 51
+			TCCR0 &= ~((1<<CS00) | (1<<CS02));		// Timer Register Position CS00/CS02 mit logisch 0 beschreiben
+  90:	83 b7       	in	r24, 0x33	; 51
+  92:	8a 7f       	andi	r24, 0xFA	; 250
+  94:	83 bf       	out	0x33, r24	; 51
+													// 12000000 / (8 * 255 * 2) = 2941,17 
+			
+			OUTPUT |= (1<<PC7);						// Wenn Teilungsfaktor 8 aktiv LED 7 HIGH
+  96:	af 9a       	sbi	0x15, 7	; 21
+			OUTPUT &= ~((1<<PC6) | (1<<PC5));		// Wenn Teilungsfaktor 8 aktiv LED 5/6 LOW
+  98:	85 b3       	in	r24, 0x15	; 21
+  9a:	8f 79       	andi	r24, 0x9F	; 159
+  9c:	85 bb       	out	0x15, r24	; 21
+  9e:	17 c0       	rjmp	.+46     	; 0xce <main+0x62>
+			/*	Mit Analog Discovery gemessen
+				T: 2,94us ~2,94 kHz				*/
+		}
+		else
+		{
+			if(!(INPUT & (1<<PA1)))	// Prüfen ob Taster S1 gedrückt
+  a0:	c9 99       	sbic	0x19, 1	; 25
+  a2:	0b c0       	rjmp	.+22     	; 0xba <main+0x4e>
+			{
+				TCCR0 |= (1<<CS02);					// Zähler mit Teilungsfaktor 256 (92 Hz) Starten
+  a4:	83 b7       	in	r24, 0x33	; 51
+  a6:	84 60       	ori	r24, 0x04	; 4
+  a8:	83 bf       	out	0x33, r24	; 51
+				TCCR0 &= ~((1<<CS00) | (1<<CS01));	// Timer Register Position CS00/CS01 mit logisch 0 beschreiben
+  aa:	83 b7       	in	r24, 0x33	; 51
+  ac:	8c 7f       	andi	r24, 0xFC	; 252
+  ae:	83 bf       	out	0x33, r24	; 51
+													// 12000000 / (256 * 255 * 2) = 91,55
+				
+				OUTPUT |= (1<<PC6);					// Wenn Teilungsfaktor 256 aktiv LED 6 HIGH
+  b0:	ae 9a       	sbi	0x15, 6	; 21
+				OUTPUT &= ~((1<<PC7) | (1<<PC5));	// Wenn Teilungsfaktor 256 aktiv LED 5/7 LOW
+  b2:	85 b3       	in	r24, 0x15	; 21
+  b4:	8f 75       	andi	r24, 0x5F	; 95
+  b6:	85 bb       	out	0x15, r24	; 21
+  b8:	0a c0       	rjmp	.+20     	; 0xce <main+0x62>
+			/*	Mit Analog Discovery gemessen
+				T: 10,89ms ~91,91 Hz ~ 92 Hz				*/
+			}
+			else									// Default bei Drücken von keiner Taste
+			{
+				TCCR0 |= (1<<CS01) | (1<<CS00);		// Zähler mit Teilungsfaktor 64 (368 Hz) Starten (default)
+  ba:	83 b7       	in	r24, 0x33	; 51
+  bc:	83 60       	ori	r24, 0x03	; 3
+  be:	83 bf       	out	0x33, r24	; 51
+				TCCR0 &= ~(1<<CS02);				// Timer Register Position CS02 mit logisch 0 beschreiben
+  c0:	83 b7       	in	r24, 0x33	; 51
+  c2:	8b 7f       	andi	r24, 0xFB	; 251
+  c4:	83 bf       	out	0x33, r24	; 51
+													// 12000000 / (64 * 255 * 2) = 367,64
+													
+				OUTPUT |= (1<<PC5);					// Wenn Teilungsfaktor 64 aktiv LED 5 HIGH
+  c6:	ad 9a       	sbi	0x15, 5	; 21
+				OUTPUT &= ~((1<<PC7) | (1<<PC6));	// Wenn Teilungsfaktor 64 aktiv LED 6/7 LOW
+  c8:	85 b3       	in	r24, 0x15	; 21
+  ca:	8f 73       	andi	r24, 0x3F	; 63
+  cc:	85 bb       	out	0x15, r24	; 21
+				T: 2,72ms ~367,66 Hz ~ 368 Hz				*/
+			}
+			
+		}
+		
+		if(!(INPUT & (1<<PA2)))		// Prüfen ob Taster S2 gedrückt
+  ce:	ca 99       	sbic	0x19, 2	; 25
+  d0:	02 c0       	rjmp	.+4      	; 0xd6 <main+0x6a>
+		{
+		OCR0 = 26;					// Tastverhältnis auf 10% ((10/256) * 100%) = 26
+  d2:	9c bf       	out	0x3c, r25	; 60
+  d4:	d8 cf       	rjmp	.-80     	; 0x86 <main+0x1a>
+		/*	Mit Analog Discovery gemessen
+			T: 2,72ms (280us HIGH) ~367,66 Hz		10,29% Pulsweite				*/
+		}
+		else
+		{
+			if(!(INPUT & (1<<PA3)))	// Prüfen ob Taster S3 gedrückt
+  d6:	cb 99       	sbic	0x19, 3	; 25
+  d8:	02 c0       	rjmp	.+4      	; 0xde <main+0x72>
+			{
+				OCR0 = 230;			// Tastverhältnis auf 10% ((90/256) * 100%) = 230
+  da:	2c bf       	out	0x3c, r18	; 60
+  dc:	d4 cf       	rjmp	.-88     	; 0x86 <main+0x1a>
+			/*	Mit Analog Discovery gemessen
+				T: 2,72ms (2,45ms HIGH) ~367,66 Hz	90,07% Pulsweite		*/
+			}
+			else
+			{
+				OCR0 = 128;			// Tastverhältnis auf 50% ((50/256) * 100%) = 128
+  de:	3c bf       	out	0x3c, r19	; 60
+  e0:	d2 cf       	rjmp	.-92     	; 0x86 <main+0x1a>
+
+000000e2 <_exit>:
+  e2:	f8 94       	cli
+
+000000e4 <__stop_program>:
+  e4:	ff cf       	rjmp	.-2      	; 0xe4 <__stop_program>

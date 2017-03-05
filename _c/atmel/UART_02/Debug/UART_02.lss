@@ -1,0 +1,327 @@
+
+UART_02.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000001fc  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  00000270  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000001  00800060  00800060  00000270  2**0
+                  ALLOC
+  3 .comment      00000030  00000000  00000000  00000270  2**0
+                  CONTENTS, READONLY
+  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000002a0  2**2
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000038  00000000  00000000  000002dc  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   000000f3  00000000  00000000  00000314  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 000000ac  00000000  00000000  00000407  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   0000014e  00000000  00000000  000004b3  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  000000e4  00000000  00000000  00000604  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    00000189  00000000  00000000  000006e8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    000001c9  00000000  00000000  00000871  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 00000028  00000000  00000000  00000a3a  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+   8:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+   c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  10:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  14:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  18:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  1c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  20:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  24:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  28:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  2c:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__vector_11>
+  30:	0c 94 8c 00 	jmp	0x118	; 0x118 <__vector_12>
+  34:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  38:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  3c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  40:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  44:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  48:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  4c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  50:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d4 e0       	ldi	r29, 0x04	; 4
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+
+00000060 <__do_clear_bss>:
+  60:	20 e0       	ldi	r18, 0x00	; 0
+  62:	a0 e6       	ldi	r26, 0x60	; 96
+  64:	b0 e0       	ldi	r27, 0x00	; 0
+  66:	01 c0       	rjmp	.+2      	; 0x6a <.do_clear_bss_start>
+
+00000068 <.do_clear_bss_loop>:
+  68:	1d 92       	st	X+, r1
+
+0000006a <.do_clear_bss_start>:
+  6a:	a1 36       	cpi	r26, 0x61	; 97
+  6c:	b2 07       	cpc	r27, r18
+  6e:	e1 f7       	brne	.-8      	; 0x68 <.do_clear_bss_loop>
+  70:	0e 94 e0 00 	call	0x1c0	; 0x1c0 <main>
+  74:	0c 94 fc 00 	jmp	0x1f8	; 0x1f8 <_exit>
+
+00000078 <__bad_interrupt>:
+  78:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000007c <__vector_11>:
+// Variablendeklaration
+volatile unsigned char FAULT;
+
+// UART Empangsroutine
+ISR(USART_RXC_vect)
+{
+  7c:	1f 92       	push	r1
+  7e:	0f 92       	push	r0
+  80:	00 90 5f 00 	lds	r0, 0x005F	; 0x80005f <__TEXT_REGION_LENGTH__+0x7e005f>
+  84:	0f 92       	push	r0
+  86:	11 24       	eor	r1, r1
+  88:	2f 93       	push	r18
+  8a:	3f 93       	push	r19
+  8c:	8f 93       	push	r24
+  8e:	9f 93       	push	r25
+  90:	ef 93       	push	r30
+  92:	ff 93       	push	r31
+  94:	cf 93       	push	r28
+  96:	df 93       	push	r29
+  98:	cd b7       	in	r28, 0x3d	; 61
+  9a:	de b7       	in	r29, 0x3e	; 62
+	FAULT = 0x00;						// Fehlervariable rücksetzten
+  9c:	10 92 60 00 	sts	0x0060, r1	; 0x800060 <_edata>
+	
+	if(UCSRA & (1<<FE))					// Wenn Rahmenfehler vorhanden
+  a0:	8b e2       	ldi	r24, 0x2B	; 43
+  a2:	90 e0       	ldi	r25, 0x00	; 0
+  a4:	fc 01       	movw	r30, r24
+  a6:	80 81       	ld	r24, Z
+  a8:	88 2f       	mov	r24, r24
+  aa:	90 e0       	ldi	r25, 0x00	; 0
+  ac:	80 71       	andi	r24, 0x10	; 16
+  ae:	99 27       	eor	r25, r25
+  b0:	89 2b       	or	r24, r25
+  b2:	19 f0       	breq	.+6      	; 0xba <__vector_11+0x3e>
+		FAULT = 0b10000000;				// Rahmenfehler setzten
+  b4:	80 e8       	ldi	r24, 0x80	; 128
+  b6:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <_edata>
+	if(UCSRA & (1<<PE))					// Wenn Paritätsfehler vorhandne
+  ba:	8b e2       	ldi	r24, 0x2B	; 43
+  bc:	90 e0       	ldi	r25, 0x00	; 0
+  be:	fc 01       	movw	r30, r24
+  c0:	80 81       	ld	r24, Z
+  c2:	88 2f       	mov	r24, r24
+  c4:	90 e0       	ldi	r25, 0x00	; 0
+  c6:	84 70       	andi	r24, 0x04	; 4
+  c8:	99 27       	eor	r25, r25
+  ca:	89 2b       	or	r24, r25
+  cc:	59 f0       	breq	.+22     	; 0xe4 <__vector_11+0x68>
+		FAULT |= FAULT | 0b01000000;	// Paritätsfehlerbit setzten
+  ce:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <_edata>
+  d2:	80 64       	ori	r24, 0x40	; 64
+  d4:	88 2f       	mov	r24, r24
+  d6:	90 e0       	ldi	r25, 0x00	; 0
+  d8:	98 2f       	mov	r25, r24
+  da:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <_edata>
+  de:	89 2b       	or	r24, r25
+  e0:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <_edata>
+
+	PORTC = (UDR & 0x0F) | FAULT;		// Ausgabe auf PORTC
+  e4:	85 e3       	ldi	r24, 0x35	; 53
+  e6:	90 e0       	ldi	r25, 0x00	; 0
+  e8:	2c e2       	ldi	r18, 0x2C	; 44
+  ea:	30 e0       	ldi	r19, 0x00	; 0
+  ec:	f9 01       	movw	r30, r18
+  ee:	20 81       	ld	r18, Z
+  f0:	2f 70       	andi	r18, 0x0F	; 15
+  f2:	30 91 60 00 	lds	r19, 0x0060	; 0x800060 <_edata>
+  f6:	23 2b       	or	r18, r19
+  f8:	fc 01       	movw	r30, r24
+  fa:	20 83       	st	Z, r18
+}
+  fc:	df 91       	pop	r29
+  fe:	cf 91       	pop	r28
+ 100:	ff 91       	pop	r31
+ 102:	ef 91       	pop	r30
+ 104:	9f 91       	pop	r25
+ 106:	8f 91       	pop	r24
+ 108:	3f 91       	pop	r19
+ 10a:	2f 91       	pop	r18
+ 10c:	0f 90       	pop	r0
+ 10e:	00 92 5f 00 	sts	0x005F, r0	; 0x80005f <__TEXT_REGION_LENGTH__+0x7e005f>
+ 112:	0f 90       	pop	r0
+ 114:	1f 90       	pop	r1
+ 116:	18 95       	reti
+
+00000118 <__vector_12>:
+
+// UART Senderoutine
+ISR(USART_UDRE_vect)
+{
+ 118:	1f 92       	push	r1
+ 11a:	0f 92       	push	r0
+ 11c:	00 90 5f 00 	lds	r0, 0x005F	; 0x80005f <__TEXT_REGION_LENGTH__+0x7e005f>
+ 120:	0f 92       	push	r0
+ 122:	11 24       	eor	r1, r1
+ 124:	2f 93       	push	r18
+ 126:	3f 93       	push	r19
+ 128:	8f 93       	push	r24
+ 12a:	9f 93       	push	r25
+ 12c:	ef 93       	push	r30
+ 12e:	ff 93       	push	r31
+ 130:	cf 93       	push	r28
+ 132:	df 93       	push	r29
+ 134:	cd b7       	in	r28, 0x3d	; 61
+ 136:	de b7       	in	r29, 0x3e	; 62
+	UDR = 0x0F & ~(PINA);				// Tasterzustände in Übertragungsregister schreiben
+ 138:	8c e2       	ldi	r24, 0x2C	; 44
+ 13a:	90 e0       	ldi	r25, 0x00	; 0
+ 13c:	29 e3       	ldi	r18, 0x39	; 57
+ 13e:	30 e0       	ldi	r19, 0x00	; 0
+ 140:	f9 01       	movw	r30, r18
+ 142:	20 81       	ld	r18, Z
+ 144:	20 95       	com	r18
+ 146:	2f 70       	andi	r18, 0x0F	; 15
+ 148:	fc 01       	movw	r30, r24
+ 14a:	20 83       	st	Z, r18
+}
+ 14c:	df 91       	pop	r29
+ 14e:	cf 91       	pop	r28
+ 150:	ff 91       	pop	r31
+ 152:	ef 91       	pop	r30
+ 154:	9f 91       	pop	r25
+ 156:	8f 91       	pop	r24
+ 158:	3f 91       	pop	r19
+ 15a:	2f 91       	pop	r18
+ 15c:	0f 90       	pop	r0
+ 15e:	00 92 5f 00 	sts	0x005F, r0	; 0x80005f <__TEXT_REGION_LENGTH__+0x7e005f>
+ 162:	0f 90       	pop	r0
+ 164:	1f 90       	pop	r1
+ 166:	18 95       	reti
+
+00000168 <uart_init>:
+
+// UART initialisieren
+void uart_init(unsigned int setubrr)	{
+ 168:	cf 93       	push	r28
+ 16a:	df 93       	push	r29
+ 16c:	00 d0       	rcall	.+0      	; 0x16e <uart_init+0x6>
+ 16e:	cd b7       	in	r28, 0x3d	; 61
+ 170:	de b7       	in	r29, 0x3e	; 62
+ 172:	9a 83       	std	Y+2, r25	; 0x02
+ 174:	89 83       	std	Y+1, r24	; 0x01
+	//unsigned int setubrr = UBRR;
+
+	UBRRH  = (unsigned char)(setubrr>>8);		// Einstellung der Baudrate (Register High)
+ 176:	80 e4       	ldi	r24, 0x40	; 64
+ 178:	90 e0       	ldi	r25, 0x00	; 0
+ 17a:	29 81       	ldd	r18, Y+1	; 0x01
+ 17c:	3a 81       	ldd	r19, Y+2	; 0x02
+ 17e:	23 2f       	mov	r18, r19
+ 180:	33 27       	eor	r19, r19
+ 182:	fc 01       	movw	r30, r24
+ 184:	20 83       	st	Z, r18
+	UBRRL |= (unsigned char)setubrr;			// Einstellung der Baudrate (Register Low)
+ 186:	89 e2       	ldi	r24, 0x29	; 41
+ 188:	90 e0       	ldi	r25, 0x00	; 0
+ 18a:	29 e2       	ldi	r18, 0x29	; 41
+ 18c:	30 e0       	ldi	r19, 0x00	; 0
+ 18e:	f9 01       	movw	r30, r18
+ 190:	30 81       	ld	r19, Z
+ 192:	29 81       	ldd	r18, Y+1	; 0x01
+ 194:	23 2b       	or	r18, r19
+ 196:	fc 01       	movw	r30, r24
+ 198:	20 83       	st	Z, r18
+
+#ifndef DOUBLESPEED
+	UCSRA &= ~(1<<U2X);							// Double Speed Mode ausschalten
+#endif
+
+	UCSRC  = (1<<URSEL) | (1<<UPM1) | (1<<USBS);				// Setzen der Stoppbits & Paritätsprüfung auf Even
+ 19a:	80 e4       	ldi	r24, 0x40	; 64
+ 19c:	90 e0       	ldi	r25, 0x00	; 0
+ 19e:	28 ea       	ldi	r18, 0xA8	; 168
+ 1a0:	fc 01       	movw	r30, r24
+ 1a2:	20 83       	st	Z, r18
+	UCSRB |= (1<<RXCIE) | (1<<UDRIE) | (1<<RXEN) | (1<<TXEN);	// Receiver Intrerrpt Freigeben und Transmitter und Receivcer einschalten
+ 1a4:	8a e2       	ldi	r24, 0x2A	; 42
+ 1a6:	90 e0       	ldi	r25, 0x00	; 0
+ 1a8:	2a e2       	ldi	r18, 0x2A	; 42
+ 1aa:	30 e0       	ldi	r19, 0x00	; 0
+ 1ac:	f9 01       	movw	r30, r18
+ 1ae:	20 81       	ld	r18, Z
+ 1b0:	28 6b       	ori	r18, 0xB8	; 184
+ 1b2:	fc 01       	movw	r30, r24
+ 1b4:	20 83       	st	Z, r18
+}
+ 1b6:	0f 90       	pop	r0
+ 1b8:	0f 90       	pop	r0
+ 1ba:	df 91       	pop	r29
+ 1bc:	cf 91       	pop	r28
+ 1be:	08 95       	ret
+
+000001c0 <main>:
+
+int main(void)
+{	
+ 1c0:	cf 93       	push	r28
+ 1c2:	df 93       	push	r29
+ 1c4:	cd b7       	in	r28, 0x3d	; 61
+ 1c6:	de b7       	in	r29, 0x3e	; 62
+	DDRIN = LOW;						// Datenrichtungsregister auf Eingang
+ 1c8:	8a e3       	ldi	r24, 0x3A	; 58
+ 1ca:	90 e0       	ldi	r25, 0x00	; 0
+ 1cc:	fc 01       	movw	r30, r24
+ 1ce:	10 82       	st	Z, r1
+	INPULL = 0x0F;						// Pullup-Widerstände an Eingang aktivieren
+ 1d0:	8b e3       	ldi	r24, 0x3B	; 59
+ 1d2:	90 e0       	ldi	r25, 0x00	; 0
+ 1d4:	2f e0       	ldi	r18, 0x0F	; 15
+ 1d6:	fc 01       	movw	r30, r24
+ 1d8:	20 83       	st	Z, r18
+
+	DDROUT = HIGH;						// Datenrichtungsregister auf Ausgang
+ 1da:	84 e3       	ldi	r24, 0x34	; 52
+ 1dc:	90 e0       	ldi	r25, 0x00	; 0
+ 1de:	2f ef       	ldi	r18, 0xFF	; 255
+ 1e0:	fc 01       	movw	r30, r24
+ 1e2:	20 83       	st	Z, r18
+	OUTPUT = LOW;						// PORTC Alle LEDs aus
+ 1e4:	85 e3       	ldi	r24, 0x35	; 53
+ 1e6:	90 e0       	ldi	r25, 0x00	; 0
+ 1e8:	fc 01       	movw	r30, r24
+ 1ea:	10 82       	st	Z, r1
+
+	uart_init((unsigned int)(UBRR));	// UART Initialisierungsroutine aufrufen
+ 1ec:	8d e4       	ldi	r24, 0x4D	; 77
+ 1ee:	90 e0       	ldi	r25, 0x00	; 0
+ 1f0:	0e 94 b4 00 	call	0x168	; 0x168 <uart_init>
+	sei();
+ 1f4:	78 94       	sei
+
+    while (1) 
+    {
+	}
+ 1f6:	ff cf       	rjmp	.-2      	; 0x1f6 <main+0x36>
+
+000001f8 <_exit>:
+ 1f8:	f8 94       	cli
+
+000001fa <__stop_program>:
+ 1fa:	ff cf       	rjmp	.-2      	; 0x1fa <__stop_program>

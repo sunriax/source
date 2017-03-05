@@ -1,0 +1,8 @@
+Reference manual:
+https://reference.digilentinc.com/basys3/refmanual
+
+Documentation:
+https://reference.digilentinc.com/reference/programmable-logic/basys-3/start
+
+Get Basys3 into VIVADO:
+https://reference.digilentinc.com/reference/software/vivado/board-files?redirect=1

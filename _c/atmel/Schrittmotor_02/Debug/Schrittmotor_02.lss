@@ -1,0 +1,288 @@
+
+Schrittmotor_02.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000170  00000000  00000000  00000094  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000008  00800060  00000170  00000204  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000002  00800068  00800068  0000020c  2**0
+                  ALLOC
+  3 .comment      00000030  00000000  00000000  0000020c  2**0
+                  CONTENTS, READONLY
+  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  0000023c  2**2
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000020  00000000  00000000  00000278  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   00000272  00000000  00000000  00000298  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 0000013d  00000000  00000000  0000050a  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   000001e6  00000000  00000000  00000647  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  00000024  00000000  00000000  00000830  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    000001d0  00000000  00000000  00000854  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    000001a5  00000000  00000000  00000a24  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 00000010  00000000  00000000  00000bc9  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+   8:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+   c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  10:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  14:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  18:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  1c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  20:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  24:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  28:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  2c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  30:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  34:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  38:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  3c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  40:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  44:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  48:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  4c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  50:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d4 e0       	ldi	r29, 0x04	; 4
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+
+00000060 <__do_copy_data>:
+  60:	10 e0       	ldi	r17, 0x00	; 0
+  62:	a0 e6       	ldi	r26, 0x60	; 96
+  64:	b0 e0       	ldi	r27, 0x00	; 0
+  66:	e0 e7       	ldi	r30, 0x70	; 112
+  68:	f1 e0       	ldi	r31, 0x01	; 1
+  6a:	02 c0       	rjmp	.+4      	; 0x70 <__do_copy_data+0x10>
+  6c:	05 90       	lpm	r0, Z+
+  6e:	0d 92       	st	X+, r0
+  70:	a8 36       	cpi	r26, 0x68	; 104
+  72:	b1 07       	cpc	r27, r17
+  74:	d9 f7       	brne	.-10     	; 0x6c <__do_copy_data+0xc>
+
+00000076 <__do_clear_bss>:
+  76:	20 e0       	ldi	r18, 0x00	; 0
+  78:	a8 e6       	ldi	r26, 0x68	; 104
+  7a:	b0 e0       	ldi	r27, 0x00	; 0
+  7c:	01 c0       	rjmp	.+2      	; 0x80 <.do_clear_bss_start>
+
+0000007e <.do_clear_bss_loop>:
+  7e:	1d 92       	st	X+, r1
+
+00000080 <.do_clear_bss_start>:
+  80:	aa 36       	cpi	r26, 0x6A	; 106
+  82:	b2 07       	cpc	r27, r18
+  84:	e1 f7       	brne	.-8      	; 0x7e <.do_clear_bss_loop>
+  86:	0e 94 49 00 	call	0x92	; 0x92 <main>
+  8a:	0c 94 b6 00 	jmp	0x16c	; 0x16c <_exit>
+
+0000008e <__bad_interrupt>:
+  8e:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+00000092 <main>:
+*/
+
+int main(void)
+{
+	// I/O Einstellungen
+	DDRIN   = LOW;	// Richtungsregister (DDR*(A)) auf Eingang
+  92:	1a ba       	out	0x1a, r1	; 26
+	DDROUT  = HIGH;	// Richtungsregister (DDR*(C)) auf Ausgang
+  94:	8f ef       	ldi	r24, 0xFF	; 255
+  96:	84 bb       	out	0x14, r24	; 20
+	INPULL  = HIGH;	// Pullup an (PORT*(A)) auf HIGH
+  98:	8b bb       	out	0x1b, r24	; 27
+	OUTPUT  = LOW;	// Ausgang (PORT(*C)) LOW, Schrittmotor aus
+  9a:	15 ba       	out	0x15, r1	; 21
+  9c:	28 e6       	ldi	r18, 0x68	; 104
+  9e:	30 e0       	ldi	r19, 0x00	; 0
+  a0:	40 e6       	ldi	r20, 0x60	; 96
+  a2:	50 e0       	ldi	r21, 0x00	; 0
+
+	// sei();					// Globale Interruptfreigabe
+
+    while (1)
+    {
+		if (_IN(S0) && _NIN(S1)) 	// Bei Taster S0 gedrück läuft Motor im Linkslauf
+  a4:	c8 99       	sbic	0x19, 0	; 25
+  a6:	2d c0       	rjmp	.+90     	; 0x102 <main+0x70>
+  a8:	89 b3       	in	r24, 0x19	; 25
+		{
+			if(count < (steps * 4))
+  aa:	80 91 68 00 	lds	r24, 0x0068	; 0x800068 <__data_end>
+  ae:	90 91 69 00 	lds	r25, 0x0069	; 0x800069 <__data_end+0x1>
+  b2:	80 32       	cpi	r24, 0x20	; 32
+  b4:	93 40       	sbci	r25, 0x03	; 3
+  b6:	b0 f4       	brcc	.+44     	; 0xe4 <main+0x52>
+  b8:	fa 01       	movw	r30, r20
+			{
+				for(unsigned char i = 0; i < sizeof(pattern); i++)
+				{
+					OUTPUT = pattern[i];
+  ba:	81 91       	ld	r24, Z+
+  bc:	85 bb       	out	0x15, r24	; 21
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  be:	81 e0       	ldi	r24, 0x01	; 1
+  c0:	9a e3       	ldi	r25, 0x3A	; 58
+  c2:	01 97       	sbiw	r24, 0x01	; 1
+  c4:	f1 f7       	brne	.-4      	; 0xc2 <main+0x30>
+  c6:	00 c0       	rjmp	.+0      	; 0xc8 <main+0x36>
+  c8:	00 00       	nop
+					_delay_us(4950);
+					count++;
+  ca:	80 91 68 00 	lds	r24, 0x0068	; 0x800068 <__data_end>
+  ce:	90 91 69 00 	lds	r25, 0x0069	; 0x800069 <__data_end+0x1>
+  d2:	01 96       	adiw	r24, 0x01	; 1
+  d4:	90 93 69 00 	sts	0x0069, r25	; 0x800069 <__data_end+0x1>
+  d8:	80 93 68 00 	sts	0x0068, r24	; 0x800068 <__data_end>
+    {
+		if (_IN(S0) && _NIN(S1)) 	// Bei Taster S0 gedrück läuft Motor im Linkslauf
+		{
+			if(count < (steps * 4))
+			{
+				for(unsigned char i = 0; i < sizeof(pattern); i++)
+  dc:	e2 17       	cp	r30, r18
+  de:	f3 07       	cpc	r31, r19
+  e0:	61 f7       	brne	.-40     	; 0xba <main+0x28>
+  e2:	e0 cf       	rjmp	.-64     	; 0xa4 <main+0x12>
+					count++;
+				}
+			}
+			else
+			{
+				OUTPUT = 0x00;
+  e4:	15 ba       	out	0x15, r1	; 21
+				count = 0;
+  e6:	10 92 69 00 	sts	0x0069, r1	; 0x800069 <__data_end+0x1>
+  ea:	10 92 68 00 	sts	0x0068, r1	; 0x800068 <__data_end>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  ee:	9f e7       	ldi	r25, 0x7F	; 127
+  f0:	6f e4       	ldi	r22, 0x4F	; 79
+  f2:	82 e1       	ldi	r24, 0x12	; 18
+  f4:	91 50       	subi	r25, 0x01	; 1
+  f6:	60 40       	sbci	r22, 0x00	; 0
+  f8:	80 40       	sbci	r24, 0x00	; 0
+  fa:	e1 f7       	brne	.-8      	; 0xf4 <main+0x62>
+  fc:	00 c0       	rjmp	.+0      	; 0xfe <main+0x6c>
+  fe:	00 00       	nop
+ 100:	d1 cf       	rjmp	.-94     	; 0xa4 <main+0x12>
+				_delay_ms(500);
+				
+			}
+		}
+		else if (_IN(S1) && _NIN(S0))	// Bei Taster S1 gedrück läuft Motor im Rechtslauf
+ 102:	c9 99       	sbic	0x19, 1	; 25
+ 104:	2d c0       	rjmp	.+90     	; 0x160 <main+0xce>
+ 106:	89 b3       	in	r24, 0x19	; 25
+		{
+			if(count < (steps * 4))
+ 108:	80 91 68 00 	lds	r24, 0x0068	; 0x800068 <__data_end>
+ 10c:	90 91 69 00 	lds	r25, 0x0069	; 0x800069 <__data_end+0x1>
+ 110:	80 32       	cpi	r24, 0x20	; 32
+ 112:	93 40       	sbci	r25, 0x03	; 3
+ 114:	b0 f4       	brcc	.+44     	; 0x142 <main+0xb0>
+ 116:	f9 01       	movw	r30, r18
+			{
+				for(unsigned char j = sizeof(pattern); j > 0; j--)
+				{
+					OUTPUT = pattern[j - 1];
+ 118:	82 91       	ld	r24, -Z
+ 11a:	85 bb       	out	0x15, r24	; 21
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 11c:	81 e0       	ldi	r24, 0x01	; 1
+ 11e:	9a e3       	ldi	r25, 0x3A	; 58
+ 120:	01 97       	sbiw	r24, 0x01	; 1
+ 122:	f1 f7       	brne	.-4      	; 0x120 <main+0x8e>
+ 124:	00 c0       	rjmp	.+0      	; 0x126 <main+0x94>
+ 126:	00 00       	nop
+					_delay_us(4950);
+					count++;
+ 128:	80 91 68 00 	lds	r24, 0x0068	; 0x800068 <__data_end>
+ 12c:	90 91 69 00 	lds	r25, 0x0069	; 0x800069 <__data_end+0x1>
+ 130:	01 96       	adiw	r24, 0x01	; 1
+ 132:	90 93 69 00 	sts	0x0069, r25	; 0x800069 <__data_end+0x1>
+ 136:	80 93 68 00 	sts	0x0068, r24	; 0x800068 <__data_end>
+		}
+		else if (_IN(S1) && _NIN(S0))	// Bei Taster S1 gedrück läuft Motor im Rechtslauf
+		{
+			if(count < (steps * 4))
+			{
+				for(unsigned char j = sizeof(pattern); j > 0; j--)
+ 13a:	e4 17       	cp	r30, r20
+ 13c:	f5 07       	cpc	r31, r21
+ 13e:	61 f7       	brne	.-40     	; 0x118 <main+0x86>
+ 140:	b1 cf       	rjmp	.-158    	; 0xa4 <main+0x12>
+					count++;
+				}
+			}
+			else
+			{
+				OUTPUT = 0x00;
+ 142:	15 ba       	out	0x15, r1	; 21
+				count = 0;
+ 144:	10 92 69 00 	sts	0x0069, r1	; 0x800069 <__data_end+0x1>
+ 148:	10 92 68 00 	sts	0x0068, r1	; 0x800068 <__data_end>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 14c:	9f e7       	ldi	r25, 0x7F	; 127
+ 14e:	6f e4       	ldi	r22, 0x4F	; 79
+ 150:	82 e1       	ldi	r24, 0x12	; 18
+ 152:	91 50       	subi	r25, 0x01	; 1
+ 154:	60 40       	sbci	r22, 0x00	; 0
+ 156:	80 40       	sbci	r24, 0x00	; 0
+ 158:	e1 f7       	brne	.-8      	; 0x152 <main+0xc0>
+ 15a:	00 c0       	rjmp	.+0      	; 0x15c <main+0xca>
+ 15c:	00 00       	nop
+ 15e:	a2 cf       	rjmp	.-188    	; 0xa4 <main+0x12>
+				_delay_ms(500);
+			}
+		}
+		else
+		{
+			count = 0;
+ 160:	10 92 69 00 	sts	0x0069, r1	; 0x800069 <__data_end+0x1>
+ 164:	10 92 68 00 	sts	0x0068, r1	; 0x800068 <__data_end>
+			OUTPUT = 0x00;
+ 168:	15 ba       	out	0x15, r1	; 21
+ 16a:	9c cf       	rjmp	.-200    	; 0xa4 <main+0x12>
+
+0000016c <_exit>:
+ 16c:	f8 94       	cli
+
+0000016e <__stop_program>:
+ 16e:	ff cf       	rjmp	.-2      	; 0x16e <__stop_program>
