@@ -1,160 +1,201 @@
 --	------------------------------------
 --	Diplomarbeit elmProject@HTL-Rankweil
---	GÄCHTER Raffael                     
---	elm-project@sunriax.at              
---	2AAELI | 2016/2017                  
+--	G.Raf@elmProject
+--	2AAELI | 2016/2017
 --	------------------------------------
---	File: vga.vhdl                    
---	Version: v1.0                       
+--	File: vga.vhd
+--	Version: v1.0
+--	------------------------------------
+--	VGA Ausgabemodul zum erzeugen der
+--	benötigten Horizontal/Vertikalen
+--	Synchronisierungssignale sowie zur
+--	Einstellung der Auflösung und der
+--	anzeige der Pixelposition
 --	------------------------------------
 
+-- Standardbibliotheken einbinden
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
--- use IEEE.STD_LOGIC_ARITH.ALL; // niemals beide NUMERIC_STD und STD_LOGIC_ARITH verwenden!!!
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity vga is
 	Generic	(
-			-- Auflösung 1280x1024@60Hz
-			nCLK			: INTEGER := 108000000;	--108 MHz
-			-- Data Width
-			nWIDTH			: INTEGER := 4;
-			
-			-- Horizontal (Komplette Linie 1584)
-			h_porchFRONT	: INTEGER := 48;		-- Pixel 48
-			h_porchBACK		: INTEGER := 248;		-- Pixel 248
-			h_syncPULSE		: INTEGER := 112;		-- Pixel 112
-			h_display		: INTEGER := 1280;		-- Pixel 1280
-			--Vertikal (Komplette Zeilen 1056)
-			v_porchFRONT	: INTEGER := 1;			-- Pixel
-			v_porchBACK		: INTEGER := 38;		-- Pixel
-			v_syncPULSE		: INTEGER := 3;			-- Pixel
-			v_display		: INTEGER := 1024;		-- Pixel
-			-- Logik Type (n=0/p=1)
-			h_syncTYPE		: STD_LOGIC := '1';		-- Positive Logik (p)
-			v_syncTYPE		: STD_LOGIC := '1'		-- Positive Logik (p)
+			-- Systemtakt
+			nCLK			: integer := 108000000;		-- VGA Systemtakt
+			nPATTERN		: integer := 4;				-- Mustergenerator Takt nCLK/nPATTERN
+	
+			-- Horizontale Einstellungen
+			h_DISPLAY		: integer := 1280;	-- Sichtbarer Bereich in Pixel
+			h_porchFRONT	: integer := 48;	-- Vordere Schwarzschzlter in pixel
+			h_porchBACK		: integer := 248;	-- Hintere Schwarzschulter in pixel
+			h_syncPULSE		: integer := 112;	-- Synchronisierungsimpuls zwischen Vorderer/Hinterer Schulter in Pixel
+			h_POLARITY		: STD_LOGIC := '1';	-- Positive Synchronisierungssignal Logik
 
+			-- Vertiakle Einstellungen
+			v_DISPLAY		: integer := 1024;	-- Sichtbarer Bereich in Pixel
+			v_porchFRONT	: integer := 1;		-- Vordere Schwarzschzlter in pixel
+			v_porchBACK		: integer := 38;	-- Hintere Schwarzschulter in pixel
+			v_syncPULSE		: integer := 3;		-- Synchronisierungsimpuls zwischen Vorderer/Hinterer Schulter in Pixel
+			v_POLARITY		: STD_LOGIC := '1';	-- Positive Synchronisierungssignal Logik
+	
+			-- Pixel Einstellungen
+			pxDATASIZE		: integer := 4;			-- Pixel Auflösung in Bit pro Kanal
+			pxMAX			: integer := 12			-- max. Anzahl an Pixeln (horizontal/vertikal) 2^pxMAX
 			);
 	Port	(
-			EN			: in STD_LOGIC;
-			vgaCLK		: in STD_LOGIC;
-			vgaTEST		: in STD_LOGIC;
-			dataR		: in STD_LOGIC_VECTOR((nWIDTH - 1) downto 0);
-			dataG		: in STD_LOGIC_VECTOR((nWIDTH - 1) downto 0);
-			dataB		: in STD_LOGIC_VECTOR((nWIDTH - 1) downto 0);
-			h_sync		: out STD_LOGIC;
-			v_sync		: out STD_LOGIC;
-			R			: out STD_LOGIC_VECTOR((nWIDTH - 1) downto 0) := (others => '0');
-			G			: out STD_LOGIC_VECTOR((nWIDTH - 1) downto 0) := (others => '0');
-			B			: out STD_LOGIC_VECTOR((nWIDTH - 1) downto 0) := (others => '0')
+			EN				:  in STD_LOGIC;
 			
+			-- VGA Taktfrequenzen
+			CLK				:  in STD_LOGIC;
+			
+			-- Rot/Grün/Blau Daten für aktuellen Pixel
+			pixelDATA		:  in STD_LOGIC_VECTOR((pxDATASIZE * 3) - 1 downto 0);
+			
+			-- Horizontal/Vertikal Synchronisierungssignal
+			h_SYNC			: out STD_LOGIC;
+			v_SYNC			: out STD_LOGIC;
+			
+			-- Ausgabedaten für Pixel auf welchen der Pixelzeiger referenziert ist
+			vgaR			: out STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0);
+			vgaG			: out STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0);
+			vgaB			: out STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0);
+			
+			-- Positionsdaten des Pixelzeigers
+			pixelX			: out integer range 0 to (2**pxMAX - 1);
+			pixelY			: out integer range 0 to (2**pxMAX - 1)
 			);
 end vga;
 
+--	VGA Darstellungsbereich/Signalverlauf, hoizontal sowie vertikal
+--
+--	+---------------------------------------------------------------+---+	+---+
+--								h_Display							  f | p	| b
+--																		+---+
+--
+--	+---------------------------------------------------------------+-----------+	+
+--	|																|			|	| 
+--	|																|			|	| v
+--	|																|			|	| |
+--	|																|			|	| D
+--	|					Sicherbarer Bildbereich						|			|	| i
+--	|																|			|	| s
+--	|																|			|	| p
+--	|																|			|	| l
+--	|																|			|	| a
+--	|																|			|	| y
+--	|																|			|	|
+--	+---------------------------------------------------------------+			|	+
+--	|																			|	| f
+--	|																			|	+---+
+--	|						Schwarz Schulter									|	  p	|
+--	|																			|	+---+
+--	|																			|	| b
+--	+---------------------------------------------------------------------------+	+
+--
+--	Der Synchronisierungsimpuls kann sowohl in positiver als auch negativer logik
+--	ausgeführt sein. Dies ist spezifisch aus den VGA-Einstellungen zu übernehmen!
+
 architecture Behavioral of vga is
-	signal h_LINE, v_LINE	: INTEGER := 0;
-	signal x, y				: INTEGER := 0;
+--	signal intpixelX	: STD_LOGIC_VECTOR(pxMAX - 1 downto 0);
+--	signal intpixelY	: STD_LOGIC_VECTOR(pxMAX - 1 downto 0);
+
+	signal intvgaR		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0);
+	signal intvgaG		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0);
+	signal intvgaB		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0);
+
+--	signal inthSYNC		: STD_LOGIC;
+--	signal intvSYNC		: STD_LOGIC;
+
+	signal pattern		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0) := (others => '0');
 begin
-	process(EN, vgaCLK, vgaTEST, dataR, dataG, dataB, h_LINE, v_LINE, x, y)
-		begin
-		  if(EN = '0') then
-             h_sync <= not(h_syncTYPE);    -- LOW
-             v_sync <= not(v_syncTYPE);    -- LOW
-             h_LINE <= 0;                -- Horizontalzähler rücksetzen
-             v_LINE <= 0;                -- Vertikalzähler rücksetzen
 
-                  x <= 0;                -- Pixelzähler Horizontal rücksetzten
-                  y <= 0;                -- Pixelzähler Vertikal rücksetzen
-             
-             R <= (others =>  '0');
-             G <= (others =>  '0');
-             B <= (others =>  '0');
-		 
-		  elsif (rising_edge(vgaCLK)) then
-			h_LINE <= h_LINE + 1;
+vgaR <= intvgaR;
+vgaG <= intvgaG;
+vgaB <= intvgaB;
 
-				-- Pixel Zähler Horizontal
-					if (h_LINE = h_porchFRONT + h_porchBACK + h_syncPULSE + h_display) then
-						h_LINE <= 0;
-						v_LINE <= v_LINE + 1;
-					end if;
+process(EN, CLK, pixelDATA)
 
-				-- Pixel Zähler Vertikal
-					if(v_LINE = v_porchFRONT + v_porchBACK + v_syncPULSE + v_display) then
-						v_LINE <= 0;
-					end if;
+		-- Prozessinterne Variablen
+		variable pixelXCNT	: integer := 0;		-- Prozess Pixelzähler in X-Richtung
+		variable pixelYCNT	: integer := 0;		-- Prozess Pixelzähler in Y-Richtung
+		
+	begin
+		-- Asynchrones Rücksetzten 
+		if(EN = '0') Then
+			
+			-- Rücksetzen der internen Prozess Pixelzähler
+			pixelXCNT := 0;
+			pixelYCNT := 0;
+		
+			-- Rücksetzten der externen Pixel Positionszeiger
+			pixelX <= 0;
+			pixelY <= 0;
+		
+			h_SYNC <= '0';
+			v_SYNC <= '0';
+		
+			intvgaR <= (others => '0');
+			intvgaG <= (others => '0');
+			intvgaB <= (others => '0');
+		
+		-- Taktflankengesteuerter Ablauf wenn Verarbeitung (über vgaMODE) angewählt
+		elsif(rising_edge(CLK)) Then
+			
+			-- Wenn X-Pixelzähler >= Horizontale Pixellänge (gesamt)
+			if (pixelXCNT >= (h_porchFRONT + h_porchBACK + h_syncPULSE + h_display - 1)) then
+				-- Rücksetzten des X-Pixelzählers sowie inkrementieren des Y-Pixelzählers
+				pixelXCNT := 0;
+				pixelYCNT := pixelYCNT + 1;
+			else
+				-- Erzeugen des horizontalen Synchronisierungssignals
+				if(pixelXCNT > (h_DISPLAY + h_porchFRONT - 1) and pixelXCNT < (h_display + h_porchFRONT + h_syncPULSE - 1)) then
+					h_SYNC <= h_POLARITY;
+				else
+					h_SYNC <= not(h_POLARITY);
+				end if;
+			
+				-- Inkrementieren des Y-Pixelzählers
+				pixelXCNT := pixelXCNT + 1;
+			end if;
 
-				-- Hsync Signal
-					if(h_LINE > (h_display + h_porchFRONT) and h_LINE < (h_display + h_porchFRONT + h_syncPULSE)) then
-						h_sync <= not(h_syncTYPE);
-					else
-						h_sync <= h_syncTYPE;
-					end if;
+			-- Wenn Y-Pixelzähler >= Vertikale Pixellänge (gesamt)
+			if(pixelYCNT >= (v_porchFRONT + v_porchBACK + v_syncPULSE + v_display) - 1) then
+				-- Rücksetzen des Y-Pixelzählers
+				pixelYCNT := 0;
+			else
+				-- Erzeugen des vertikalen Synchronisierungssignals
+				if(pixelYCNT > (v_display + v_porchFRONT - 1) and pixelYCNT < (v_display + v_porchFRONT + v_syncPULSE - 1)) then
+					v_SYNC <= v_POLARITY;
+				else
+					v_SYNC <= not(v_POLARITY);
+				end if;
+			end if;
 
-				-- Vsync Signal
-					if(v_LINE > (v_display + v_porchFRONT) and v_LINE < (v_display + v_porchFRONT + v_syncPULSE)) then
-						v_sync <= not(v_syncTYPE);
-					else
-						v_sync <= v_syncTYPE;
-					end if;
+			-- Ausgabe der Pixeldaten
+			if((pixelXCNT < (h_DISPLAY - 1)) and (pixelYCNT < (v_DISPLAY - 1))) Then
+				-- Stand der internen Prozesspixelzähler auf externe Pixel Positionszeiger
+				pixelX <= pixelXCNT;
+				pixelY <= pixelYCNT;
+				
+				-- Ausgabe der Eingabedaten
+				intvgaR <= pixeldata((pxDATASIZE * 3) - 1 downto (pxDATASIZE * 2));
+				intvgaG <= pixeldata((pxDATASIZE * 2) - 1 downto pxDATASIZE);
+				intvgaB <= pixeldata(pxDATASIZE - 1 downto 0);
+			else
+				-- Rücksetzen der Pixelzähler
+				pixelX <= 0;
+			
+				if(pixelYCNT > (v_DISPLAY - 1)) Then
+					pixelY <= 0;
+				end if;
+			
+				-- Rücksetzten der VGA Datenausgänge
+				intvgaR <= (others => '0');
+				intvgaG <= (others => '0');
+				intvgaB <= (others => '0');
+			end if;
+		end if;
+end process;
 
-				if((h_LINE < h_display) and (v_LINE < v_display)) then
-					if(vgaTEST = '0') Then
-						R <= dataR;
-						G <= dataG;
-						B <= dataB;
-					else
-					
-						-- Hintergrundfarbe Gelb
-						R <= (others =>  '1');
-						G <= (others =>  '1');
-						B <= (others =>  '0');
-						
-						-- Weißes Fadenkreuz
-						if(	(h_LINE >= ((h_display / 2) - 5) and h_LINE <= ((h_display / 2) + 5)) or
-							(v_LINE >= ((v_display / 2) - 5) and v_LINE <= ((v_display / 2) + 5))	) then
-								R <= (others =>  '1');
-								G <= (others =>  '1');
-								B <= (others =>  '1');
-	
-						-- Farbpalette
-						elsif(	(h_LINE >= 1  and h_LINE <= ((h_display / 2) - 5)) and
-								(v_LINE >= 1  and v_LINE <= ((v_display / 2) - 5))	) then
-	
-							R <= x"F";
-							G <= (others => '0');
-							B <= (others => '0');
-	
-						elsif(	(h_LINE >= ((h_display / 2) + 5) and h_LINE <= h_display) and
-								(v_LINE >= 1 and v_LINE <= ((v_display / 2) - 5))	) then
-	
-							R <= (others => '0');
-							G <= x"F";
-							B <= (others => '0');
-						
-						elsif(	(h_LINE >= 0 and h_LINE <= ((h_display / 2) - 5)) and
-								(v_LINE >= ((v_display / 2) + 5) and v_LINE <= v_display)	) then
-														
-							R <= (others => '0');
-							G <= (others => '0');
-							B <= x"F";
-						
-						elsif(	(h_LINE >= ((h_display / 2) + 5) and h_LINE <= h_display) and
-								(v_LINE >= ((v_display / 2) + 5) and v_LINE <= v_display)	) then
-														
-							R <= x"A";
-							G <= x"A";
-							B <= x"A";
-						
-						end if;
-                 end if;
-          else
-            R <= (others => '0');
-            G <= (others => '0');
-            B <= (others => '0');
-         end if;
-        end if;
-	end process;
-	
 end Behavioral;
