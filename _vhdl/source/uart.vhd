@@ -1,12 +1,11 @@
---	-------------------------------------
+--	------------------------------------
 --	Diplomarbeit elmProject@HTL-Rankweil
---	GÄCHTER Raffael
---	elm-project@hotmail.com
+--	G.Raf@elmProject
 --	2AAELI | 2016/2017
---	-------------------------------------
---	File: uart.vhd
+--	------------------------------------
+--	File: master.vhd
 --	Version: v1.0
---	-------------------------------------
+--	------------------------------------
 --	UART Schnittstelle zum FPGA
 --	VOLLDUPLEX mit Lese/Schreib Buffer,
 --	Paritätsbit und 2 Stoppbit.
@@ -26,34 +25,31 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use IEEE.NUMERIC_STD.ALL;
--- niemals beide NUMERIC_STD und STD_LOGIC_ARITH verwenden!!!
---use IEEE.STD_LOGIC_ARITH.ALL;
-
 
 entity uart is
 	Generic	(
-			constant SYS_CLK	: integer range 0 to 100000000 := 100000000;	-- 100 MHz Systemtakt	
-			constant BAUD		: integer range 0 to 921600	:= 921600;		-- Bits / Sekunde (BAUD)
-			constant QUANTIL	: integer range 0 to 16		:= 12;			-- Abtastungen / Bit (Alle 58 Takte)
+			constant SYS_CLK	: integer range 0 to 200000000	:= 100000000;	-- 100 MHz Systemtakt	
+			constant BAUD		: integer range 0 to 921600		:= 921600;		-- Bits / Sekunde (BAUD)
+			constant QUANTIL	: integer range 0 to 16			:= 12;			-- Abtastungen / Bit
 			constant DATASIZE	: integer range 0 to 9			:= 8;			-- Datenbit Länge
 			constant PARITY		: integer range 0 to 1			:= 1;			-- Parity Bit Length
 			constant STOPBIT	: integer range 0 to 2			:= 2;			-- Anzahl der Stoppbits
-			constant PARITYBIT	: STD_LOGIC					:= '0';			-- 0=Even/1=Odd (unwirksam wenn PARITY auf 0)
-			constant HANDSHAKE	: STD_LOGIC					:= '1';			-- Software Handschake XON/XOFF (nur für Remotesystem)
+			constant PARITYBIT	: STD_LOGIC						:= '0';			-- 0=Even/1=Odd (unwirksam wenn PARITY auf 0)
+			constant HANDSHAKE	: STD_LOGIC						:= '1';			-- Software Handschake XON/XOFF (nur für Remotesystem)
 																				-- Uart sendet kein XON/XOFF da normalerweise nicht notwendig
 			constant FIFO_DEPTH	: integer range 0 to 128		:= 80			-- max. Anzahl möglicher Zeichen (für Befehlscoder/decoder)
 			);
 		Port(
-			EN		:	in	STD_LOGIC;									-- Modul aktiv
-			CLK		:	in	STD_LOGIC;									-- Systemtakt
-			FLUSH	:	in	STD_LOGIC;									-- Alles leeren
-			WRITE	:	in	STD_LOGIC;									-- Daten auf UART schreiben
-			READ	:	in 	STD_LOGIC;									-- Daten von UART lesen
-			dataWR	:	in	STD_LOGIC_VECTOR(DATASIZE - 1 downto 0);						-- Daten über UART Senden
+			EN		:	in	STD_LOGIC;													-- Modul aktiv
+			CLK		:	in	STD_LOGIC;													-- Systemtakt
+			FLUSH	:	in	STD_LOGIC;													-- Alles leeren
+			WRITE	:	in	STD_LOGIC;													-- Daten auf UART schreiben
+			READ	:	in 	STD_LOGIC;													-- Daten von UART lesen
+			dataWR	:	in	STD_LOGIC_VECTOR(DATASIZE - 1 downto 0);					-- Daten über UART Senden
 			dataRD	:	out	STD_LOGIC_VECTOR(DATASIZE - 1 downto 0):= (others => '0');	-- Daten über UART Empfangen
-			RxD		:	in	STD_LOGIC;											-- Recieve Data
-			TxD		:	out	STD_LOGIC	:= '1';									-- Transmit Data
-			FREG	:	out	STD_LOGIC_VECTOR (7 downto 0) := (others => '0')	-- Flagregister	
+			RxD		:	in	STD_LOGIC;													-- Recieve Data
+			TxD		:	out	STD_LOGIC	:= '1';											-- Transmit Data
+			FREG	:	out	STD_LOGIC_VECTOR (7 downto 0) := (others => '0')			-- Flagregister	
 			);
 end uart;
 
@@ -77,7 +73,6 @@ architecture Behavioral of uart is
 	constant XON		: STD_LOGIC_VECTOR(7 downto 0) := x"11";	-- XON (Sendefreigabe/Empfangsfreigabe)
 	constant XOFF		: STD_LOGIC_VECTOR(7 downto 0) := x"13";	-- XOFF (Sendestopp/Empfangsstopp)
 	
-
 	-- Systemvariablen
 	signal intCTS	:	STD_LOGIC := '1';
 	signal intRTS	:	STD_LOGIC := '1';
@@ -108,25 +103,29 @@ architecture Behavioral of uart is
 	signal FifoRX_IN	:	STD_LOGIC_VECTOR(7 downto 0);
 
 -- FIFO Komponente deklarieren
-component Fifo is
+component fifo is
 	Generic	(
 		constant SYS_CLK	: integer;
 		constant FIFO_ADDR	: integer;
 		constant FIFO_DATA	: integer
 		);
 	Port(
-		EN, CLK, FLUSH	: in  STD_LOGIC;
-		writeEN, readEN	: in  STD_LOGIC;
-		dataIN			: in  STD_LOGIC_VECTOR (DATASIZE - 1 downto 0);
-		dataOUT			: out STD_LOGIC_VECTOR (DATASIZE - 1 downto 0);
-		FULL, EMPTY		: out STD_LOGIC
+		EN				: in  STD_LOGIC;
+		CLK				: in  STD_LOGIC;
+		FLUSH			: in  STD_LOGIC;
+		writeEN			: in  STD_LOGIC;
+		readEN			: in  STD_LOGIC;
+		dataIN			: in  STD_LOGIC_VECTOR(DATASIZE - 1 downto 0);
+		dataOUT			: out STD_LOGIC_VECTOR(DATASIZE - 1 downto 0) := (others => '0');
+		FULL			: out STD_LOGIC := '0';
+		EMPTY			: out STD_LOGIC := '0'
 		);
-end component Fifo;
+end component fifo;
 
 begin
 
 	-- Einbinden des Sende FIFO (16 Byte Speicherplätze)
-	txFIFO:	Fifo	generic map	(
+	txFIFO:	fifo	generic map	(
 					 			SYS_CLK		=>	SYS_CLK,
 					 			FIFO_ADDR	=>	FIFO_DEPTH,
 					 			FIFO_DATA	=>	DATASIZE
@@ -144,7 +143,7 @@ begin
 								);
 
 	-- Einbinden des Empangs FIFO (16 Byte Speicherplätze)
-	rxFIFO:	Fifo 	generic map	(
+	rxFIFO:	fifo 	generic map	(
 					 			SYS_CLK		=>	SYS_CLK,
 					 			FIFO_ADDR	=>	FIFO_DEPTH,
 					 			FIFO_DATA	=>	DATASIZE
@@ -177,15 +176,16 @@ begin
 RECEIVE:	process(CLK, intRXD, FifoRX_FULL, FifoRX_IN, intCTS, intRTS)
 					-- Empänger Prozesskonstanten
 					constant rxBITEDGE1	: STD_LOGIC_VECTOR((BIT_SIZE / 2) + 1 downto (BIT_SIZE / 2)) := (others => '1');	-- Flankenerkennungskonstante HIGH Teil
-					constant rxBITEDGE0	: STD_LOGIC_VECTOR((BIT_SIZE / 2) - 1 downto 0) := (others => '0');				-- Flankenerkennungskonstante LOW Teil
+					constant rxBITEDGE0	: STD_LOGIC_VECTOR((BIT_SIZE / 2) - 1 downto 0) := (others => '0');					-- Flankenerkennungskonstante LOW Teil
+					
 					-- Empänger Prozessvariablen
-					variable rxBIT_CNT	: integer := 0;														-- Bit Zähler (0 bis SYS_CLK/BAUD)
-					variable rxBIT_POS	: integer := 0;														-- Bit Position (0 bis max. 13)
-					variable rxSTARTBIT	: STD_LOGIC_VECTOR((BIT_SIZE / 2) + 1 downto 0) := (others => '1');	-- Flankenerkennung (Startbit)
-					variable rxDATA		: STD_LOGIC_VECTOR(DATASIZE - 1 downto 0) := (others => '0');			-- Datenwort der seriellen Übertragung
-					variable rxWATCH	: STD_LOGIC_VECTOR(2 downto 0);										-- Anzahl der zu vergleichnenden Bits bei Bitabtastung
-					variable rxPARITY	: STD_LOGIC := PARITYBIT;												-- Paritybit (Even/Odd) im Header einzustellen
-					variable rxCOMPLETE	: boolean := true;														-- Übertragung abgeschlossen
+					variable rxBIT_CNT	: integer := 0;																		-- Bit Zähler (0 bis SYS_CLK/BAUD)
+					variable rxBIT_POS	: integer := 0;																		-- Bit Position (0 bis max. 13)
+					variable rxSTARTBIT	: STD_LOGIC_VECTOR((BIT_SIZE / 2) + 1 downto 0) := (others => '1');					-- Flankenerkennung (Startbit)
+					variable rxDATA		: STD_LOGIC_VECTOR(DATASIZE - 1 downto 0) := (others => '0');						-- Datenwort der seriellen Übertragung
+					variable rxWATCH	: STD_LOGIC_VECTOR(2 downto 0);														-- Anzahl der zu vergleichnenden Bits bei Bitabtastung
+					variable rxPARITY	: STD_LOGIC := PARITYBIT;															-- Paritybit (Even/Odd) im Header einzustellen
+					variable rxCOMPLETE	: boolean := true;																	-- Übertragung abgeschlossen
 				begin
 
 					if(rising_edge(CLK)) Then
@@ -429,9 +429,7 @@ TRANSMIT:	process(EN, CLK, FifoTX_EMPTY, FifoTX_OUT, intCTS)
 							txBAUD_CLK := txBAUD_CLK + 1;		-- UART Takt inkrementieren
 						
 						end if;
-						
 					end if;
-					
 			end process TRANSMIT;
-
 end Behavioral;
+

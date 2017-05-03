@@ -1,54 +1,54 @@
 --	------------------------------------
 --	Diplomarbeit elmProject@HTL-Rankweil
---	GÄCHTER Raffael
---	elm-project@hotmail.com
+--	G.Raf@elmProject
 --	2AAELI | 2016/2017
 --	------------------------------------
---	File: fifo.vhd
+--	File: master.vhd
 --	Version: v1.0
 --	------------------------------------
 --	First in First out Schnittstelle
 --	mit wählbarer Speichertife und
---  FLAG Register! Standardspeichertife
+--  FLAG Register! Standardspeichertiefe
 --	(2^4) - 1 = 0 -- 15, Datenbreite
 --	8 Bits = 1 Byte 
-
- 
 --	------------------------------------
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use IEEE.NUMERIC_STD.ALL;
--- niemals beide NUMERIC_STD und STD_LOGIC_ARITH verwenden!!!
---use IEEE.STD_LOGIC_ARITH.ALL;
 
 entity fifo is
 	Generic	(
 			constant SYS_CLK	: integer range 0 to 100000000 := 100000000;	-- 100 MHz Systemtakt
-			constant FIFO_ADDR	: integer range 0 to 1024		:= 128;			-- Speicherbreite in Byte
-			constant FIFO_DATA	: integer range 0 to 8			:= 8			-- Datenbreite
+			constant FIFO_ADDR	: integer range 0 to 1024		:= 128;			-- Speicherbreite (Byte)
+			constant FIFO_DATA	: integer range 0 to 8			:= 8			-- Datenbreite (Bit)
 			);
 		Port(
-			EN, CLK, FLUSH	: in  STD_LOGIC;														-- System Signale
-			writeEN, readEN	: in  STD_LOGIC;														-- Lese/Schreib aktivierung
-			dataIN			: in  STD_LOGIC_VECTOR (FIFO_DATA - 1 downto 0);						-- Daten eingabe
-			dataOUT			: out STD_LOGIC_VECTOR (FIFO_DATA - 1 downto 0) := (others => '0');	-- Daten ausgabe
-			FULL, EMPTY		: out STD_LOGIC														-- VOLL / LEER rückgabe
+			EN				: in  STD_LOGIC;														-- Einschalten
+			CLK				: in  STD_LOGIC;														-- Takteingang
+			FLUSH			: in  STD_LOGIC;														-- Leeren
+			writeEN			: in  STD_LOGIC;														-- Daten schreiben
+			readEN			: in  STD_LOGIC;														-- Daten lesen
+			dataIN			: in  STD_LOGIC_VECTOR (FIFO_DATA - 1 downto 0);						-- Sende Datenwort
+			dataOUT			: out STD_LOGIC_VECTOR (FIFO_DATA - 1 downto 0) := (others => '0');		-- Empfangs Datenwort
+			FULL			: out STD_LOGIC := '0';													-- VOLL rückgabe
+			EMPTY			: out STD_LOGIC := '0'													-- LEER rückgabe
 			);
 end fifo;
 
 architecture Behavioral of fifo is
+
 	-- Standardsignale
 	signal pointerHEAD	: integer range 0 to FIFO_ADDR := 0;	-- Schreibzähler
 	signal pointerTAIL	: integer range 0 to FIFO_ADDR	:= 0;	-- Lesezähler
-	signal intFULL	: STD_LOGIC := '0';	-- FIFO voll (intern)
-	signal intEMPTY	: STD_LOGIC := '0';	-- FIFO leer (intern)
+	signal intFULL		: STD_LOGIC := '0';						-- FIFO voll (intern)
+	signal intEMPTY		: STD_LOGIC := '0';						-- FIFO leer (intern)
 
 	type memory is array(0 to FIFO_ADDR) of STD_LOGIC_VECTOR((FIFO_DATA - 1) downto 0);	-- Datenarray mit ((2^FIFO_ADDR) - 1) Speicherplätzen
-	signal FIFO : memory := (others => (others => '0'));											-- FIFO mit 0 initialisieren
-begin
+	signal FIFO : memory := (others => (others => '0'));								-- FIFO mit 0 initialisieren
 
+begin
 	
 	EMPTY <= intEMPTY;
 	FULL <= intFULL;

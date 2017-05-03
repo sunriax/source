@@ -25,7 +25,6 @@ entity display is
 			nCLK1280x1024	: integer := 108000000;	--108 MHz @ 60 Hz
 			nCLK1024x768	: integer := 65000000;	-- 65 MHz @ 60 Hz
 			nCLK800x600		: integer := 40000000;	-- 40 MHz @ 60 Hz
-			nCLK640x480		: integer := 25175000;	-- 25.175 MHz @ 60 Hz
 			
 			-- Wählbare auflösungen
 			nCHANNEL		: integer := 1;			-- 2^nCHANNEL Anzahl möglicher Auflösungen
@@ -34,14 +33,13 @@ entity display is
 			pxDATASIZE		: integer := 4;			-- Pixel Auflösung in Bit pro Kanal
 			pxMAX			: integer := 12			-- max. Anzahl an Pixeln (horizontal/vertikal) 2^pxMAX
 			);
-	Port	(
+		Port(
 			EN				:  in STD_LOGIC;
 			
 			-- VGA Taktfrequenzen
 			CLK1280x1024	:  in STD_LOGIC;
 			CLK1024x768		:  in STD_LOGIC;
 			CLK800x600		:  in STD_LOGIC;
-			CLK640x480		:  in STD_LOGIC;
 			
 			-- VGA Einstellungen
 			vgaMODE			:  in STD_LOGIC_VECTOR((2**nCHANNEL) - 1 downto 0);
@@ -99,9 +97,10 @@ architecture Structure of display is
 	end component vga;
 
 	-- Mögliche Addressen
-	signal intADDR		: STD_LOGIC_VECTOR(((2**nCHANNEL) * 2)- 1 downto 0);
+	--signal intADDR		: STD_LOGIC_VECTOR(((2**nCHANNEL) * 2)- 1 downto 0);
 
 	-- Interne Signale für Auflösung 1280x1024
+	signal intEN1280x1024		: STD_LOGIC := '0';
 	signal intpixelX1280x1024	: integer range 0 to (2**pxMAX - 1) := 0;
 	signal intpixelY1280x1024	: integer range 0 to (2**pxMAX - 1) := 0;
 	signal intvgaR1280x1024		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0) := (others => '0');
@@ -111,6 +110,7 @@ architecture Structure of display is
 	signal intvSYNC1280x1024	: STD_LOGIC := '0';
 	
 	-- Interne Signale für Auflösung 1024x768
+	signal intEN1024x768		: STD_LOGIC := '0';
 	signal intpixelX1024x768	: integer range 0 to (2**pxMAX - 1) := 0;
 	signal intpixelY1024x768	: integer range 0 to (2**pxMAX - 1) := 0;
 	signal intvgaR1024x768		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0) := (others => '0');
@@ -119,7 +119,8 @@ architecture Structure of display is
 	signal inthSYNC1024x768		: STD_LOGIC := '0';
 	signal intvSYNC1024x768		: STD_LOGIC := '0';
 
-	-- Interne Signale für Auflösung 1024x768
+	-- Interne Signale für Auflösung 800x600
+	signal intEN800x600			: STD_LOGIC := '0';
 	signal intpixelX800x600		: integer range 0 to (2**pxMAX - 1) := 0;
 	signal intpixelY800x600		: integer range 0 to (2**pxMAX - 1) := 0;
 	signal intvgaR800x600		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0) := (others => '0');
@@ -128,68 +129,57 @@ architecture Structure of display is
 	signal inthSYNC800x600		: STD_LOGIC := '0';
 	signal intvSYNC800x600		: STD_LOGIC := '0';
 
-	-- Interne Signale für Auflösung 1024x768
-	signal intpixelX640x480		: integer range 0 to (2**pxMAX - 1) := 0;
-	signal intpixelY640x480		: integer range 0 to (2**pxMAX - 1) := 0;
-	signal intvgaR640x480		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0) := (others => '0');
-	signal intvgaG640x480		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0) := (others => '0');
-	signal intvgaB640x480		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0) := (others => '0');
-	signal inthSYNC640x480		: STD_LOGIC := '0';
-	signal intvSYNC640x480		: STD_LOGIC := '0';
-
 begin
 
 -- VGA Synchronsierungssignale
-h_SYNC <= (inthSYNC640x480 or inthSYNC800x600 or inthSYNC1024x768 or inthSYNC1280x1024) WHEN EN = '1' ELSE '0';
-v_SYNC <= (intvSYNC640x480 or intvSYNC800x600 or intvSYNC1024x768 or intvSYNC1280x1024) WHEN EN = '1' ELSE '0';
+h_SYNC <= (inthSYNC800x600 or inthSYNC1024x768 or inthSYNC1280x1024) WHEN EN = '1' ELSE '0';
+v_SYNC <= (intvSYNC800x600 or intvSYNC1024x768 or intvSYNC1280x1024) WHEN EN = '1' ELSE '0';
 
 -- VGA Datensignale (Farbkanäle)
-vgaR <= (intvgaR640x480 or intvgaR800x600 or intvgaR1024x768 or intvgaR1280x1024) WHEN EN = '1' ELSE (others => '0');
-vgaG <= (intvgaR640x480 or intvgaG800x600 or intvgaG1024x768 or intvgaG1280x1024) WHEN EN = '1' ELSE (others => '0');
-vgaB <= (intvgaR640x480 or intvgaB800x600 or intvgaB1024x768 or intvgaB1280x1024) WHEN EN = '1' ELSE (others => '0');
+vgaR <= (intvgaR800x600 or intvgaR1024x768 or intvgaR1280x1024) WHEN EN = '1' ELSE (others => '0');
+vgaG <= (intvgaG800x600 or intvgaG1024x768 or intvgaG1280x1024) WHEN EN = '1' ELSE (others => '0');
+vgaB <= (intvgaB800x600 or intvgaB1024x768 or intvgaB1280x1024) WHEN EN = '1' ELSE (others => '0');
 
-pixelX <= STD_LOGIC_VECTOR(to_unsigned(intpixelX640x480, pxMAX)) or STD_LOGIC_VECTOR(to_unsigned(intpixelX800x600,  pxMAX)) or STD_LOGIC_VECTOR(to_unsigned(intpixelX1024x768,   pxMAX)) or STD_LOGIC_VECTOR(to_unsigned(intpixelX1280x1024,   pxMAX)) WHEN EN = '1' ELSE (others => '0');
-pixelY <= STD_LOGIC_VECTOR(to_unsigned(intpixelY640x480, pxMAX)) or STD_LOGIC_VECTOR(to_unsigned(intpixelY800x600,  pxMAX)) or STD_LOGIC_VECTOR(to_unsigned(intpixelY1024x768,   pxMAX)) or STD_LOGIC_VECTOR(to_unsigned(intpixelY1280x1024,   pxMAX)) WHEN EN = '1' ELSE (others => '0');
+pixelX <= STD_LOGIC_VECTOR(to_unsigned(intpixelX800x600,  pxMAX)) or STD_LOGIC_VECTOR(to_unsigned(intpixelX1024x768,   pxMAX)) or STD_LOGIC_VECTOR(to_unsigned(intpixelX1280x1024,   pxMAX)) WHEN EN = '1' ELSE (others => '0');
+pixelY <= STD_LOGIC_VECTOR(to_unsigned(intpixelY800x600,  pxMAX)) or STD_LOGIC_VECTOR(to_unsigned(intpixelY1024x768,   pxMAX)) or STD_LOGIC_VECTOR(to_unsigned(intpixelY1280x1024,   pxMAX)) WHEN EN = '1' ELSE (others => '0');
 
 -- Anwahl des VGA Moduls
-process(vgaMODE)
+--process(vgaMODE)
+--	begin
+--		case(vgaMODE) is
+--			when "01"	=>	intADDR <= "0010";	-- Anwahl Auflösung 800x600
+--			when "10"	=>	intADDR <= "0100";	-- Anwahl Auflösung 1024x768
+--			when "11"	=>	intADDR <= "1000";	-- Anwahl Auflösung 1280x1024
+--			when others	=>	intADDR <= "0001";	-- Anwahl Standardauflösung 640x480
+--		end case;
+--end process;
+
+process(EN, CLK800x600, vgaMODE)
 	begin
-		case(vgaMODE) is
-			when "01"	=>	intADDR <= "0010";	-- Anwahl Auflösung 800x600
-			when "10"	=>	intADDR <= "0100";	-- Anwahl Auflösung 1024x768
-			when "11"	=>	intADDR <= "1000";	-- Anwahl Auflösung 1280x1024
-			when others	=>	intADDR <= "0001";	-- Anwahl Standardauflösung 640x480
-		end case;
+		if(EN = '0' or vgaMODE /= "01") Then
+			intEN800x600 <= '0';
+		elsif(rising_edge(CLK800x600) and EN = '1' and vgaMODE = "01") Then
+			intEN800x600 <= '1';
+		end if;
 end process;
 
-VGA640x480:		vga generic map	(
-								nCLK			=>	nCLK640x480,
-								nPATTERN		=>	4,
-								h_DISPLAY		=>	640,
-								h_porchFRONT	=>	16,
-								h_porchBACK		=>	48,
-								h_syncPULSE		=>	96,
-								h_POLARITY		=>	'0',
-								v_DISPLAY		=>	480,
-								v_porchFRONT	=>	10,
-								v_porchBACK		=>	33,
-								v_syncPULSE		=>	2,
-								v_POLARITY		=>	'0',
-								pxDATASIZE		=>	pxDATASIZE,
-								pxMAX			=>	pxMAX
-								)
-						port map(
-								EN			=>	intADDR(0),
-								CLK			=>	CLK640x480,
-								pixelDATA	=>	pixelDATA,
-								h_SYNC		=>	inthSYNC640x480,
-								v_SYNC		=>	intvSYNC640x480,
-								vgaR		=>	intvgaR640x480,
-								vgaG		=>	intvgaG640x480,
-								vgaB		=>	intvgaB640x480,
-								pixelX		=>	intpixelX640x480,
-								pixelY		=>	intpixelY640x480
-								);
+process(EN, CLK1024x768, vgaMODE)
+	begin
+		if(EN = '0' or vgaMODE /= "10") Then
+			intEN1024x768 <= '0';
+		elsif(rising_edge(CLK1024x768) and EN = '1' and vgaMODE = "10") Then
+			intEN1024x768 <= '1';
+		end if;
+end process;
+
+process(EN, CLK1280x1024, vgaMODE)
+	begin
+		if(EN = '0' or vgaMODE /= "11") Then
+			intEN1280x1024 <= '0';
+		elsif(rising_edge(CLK1280x1024) and EN = '1' and vgaMODE = "11") Then
+			intEN1280x1024 <= '1';
+		end if;
+end process;
 
 VGA800x600:		vga generic map	(
 								nCLK			=>	nCLK800x600,
@@ -208,7 +198,7 @@ VGA800x600:		vga generic map	(
 								pxMAX			=>	pxMAX
 								)
 						port map(
-								EN			=>	intADDR(1),
+								EN			=>	intEN800x600,
 								CLK			=>	CLK800x600,
 								pixelDATA	=>	pixelDATA,
 								h_SYNC		=>	inthSYNC800x600,
@@ -237,7 +227,7 @@ VGA1024x768:	vga generic map	(
 								pxMAX			=>	pxMAX
 								)
 						port map(
-								EN			=>	intADDR(2),
+								EN			=>	intEN1024x768,
 								CLK			=>	CLK1024x768,
 								pixelDATA	=>	pixelDATA,
 								h_SYNC		=>	inthSYNC1024x768,
@@ -266,7 +256,7 @@ VGA1280x1024:	vga generic map	(
 								pxMAX			=>	pxMAX
 								)
 						port map(
-								EN			=>	intADDR(3),
+								EN			=>	intEN1280x1024,
 								CLK			=>	CLK1280x1024,
 								pixelDATA	=>	pixelDATA,
 								h_SYNC		=>	inthSYNC1280x1024,

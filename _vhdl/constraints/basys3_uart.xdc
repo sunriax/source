@@ -4,10 +4,10 @@
 ## - rename the used ports (in each line, after get_ports) according to the top level signal names in the project
 
 ##USB-RS232 Interface
-#set_property PACKAGE_PIN B18 [get_ports UART_RXD]						
-#	set_property IOSTANDARD LVCMOS33 [get_ports UART_RXD]
-#set_property PACKAGE_PIN A18 [get_ports UART_TXD]						
-#	set_property IOSTANDARD LVCMOS33 [get_ports UART_TXD]
+set_property PACKAGE_PIN B18 [get_ports UART_RXD]						
+	set_property IOSTANDARD LVCMOS33 [get_ports UART_RXD]
+set_property PACKAGE_PIN A18 [get_ports UART_TXD]						
+	set_property IOSTANDARD LVCMOS33 [get_ports UART_TXD]
 
 ##USB HID (PS/2)
 #set_property PACKAGE_PIN C17 [get_ports PS2Clk]						

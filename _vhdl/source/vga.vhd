@@ -97,15 +97,10 @@ end vga;
 --	ausgeführt sein. Dies ist spezifisch aus den VGA-Einstellungen zu übernehmen!
 
 architecture Behavioral of vga is
---	signal intpixelX	: STD_LOGIC_VECTOR(pxMAX - 1 downto 0);
---	signal intpixelY	: STD_LOGIC_VECTOR(pxMAX - 1 downto 0);
 
 	signal intvgaR		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0);
 	signal intvgaG		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0);
 	signal intvgaB		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0);
-
---	signal inthSYNC		: STD_LOGIC;
---	signal intvSYNC		: STD_LOGIC;
 
 	signal pattern		: STD_LOGIC_VECTOR(pxDATASIZE - 1 downto 0) := (others => '0');
 begin
@@ -117,16 +112,16 @@ vgaB <= intvgaB;
 process(EN, CLK, pixelDATA)
 
 		-- Prozessinterne Variablen
-		variable pixelXCNT	: integer := 0;		-- Prozess Pixelzähler in X-Richtung
-		variable pixelYCNT	: integer := 0;		-- Prozess Pixelzähler in Y-Richtung
+		variable pixelXCNT	: integer range 0 to (2**pxMAX - 1) := 0;		-- Prozess Pixelzähler in X-Richtung
+		variable pixelYCNT	: integer range 0 to (2**pxMAX - 1) := 0;		-- Prozess Pixelzähler in Y-Richtung
 		
 	begin
 		-- Asynchrones Rücksetzten 
 		if(EN = '0') Then
 			
 			-- Rücksetzen der internen Prozess Pixelzähler
-			pixelXCNT := 0;
-			pixelYCNT := 0;
+			-- pixelXCNT := 0;
+			-- pixelYCNT := 0;
 		
 			-- Rücksetzten der externen Pixel Positionszeiger
 			pixelX <= 0;

@@ -23,7 +23,7 @@ end vga_tb;
 architecture Simulation of vga_tb is
 
 	-- Simulationskonstanten
-	constant CLK_period : time := 9259 ps;    -- Systemtakt 100 MHz
+	constant CLK_period : time := 100 ns;   	-- Systemtakt 100 MHz
 	constant pxDATASIZE	: integer := 4;			-- Pixel Auflösung in Bit pro Kanal
 	constant pxMAX		: integer := 12;		-- max. Anzahl an Pixeln (horizontal/vertikal) 2^pxMAX
 
@@ -41,7 +41,7 @@ architecture Simulation of vga_tb is
 
 	-- Komponentendeklaration
 	component vga is
-	Port	(
+		Port(
 			EN				:  in STD_LOGIC;
 			CLK				:  in STD_LOGIC;
 			pixelDATA		:  in STD_LOGIC_VECTOR((pxDATASIZE * 3) - 1 downto 0);

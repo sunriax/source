@@ -36,7 +36,7 @@ architecture Simulation of pattern_tb is
 	signal simpixelX	: STD_LOGIC_VECTOR(pxMAX - 1 downto 0);
 	signal simpixelY	: STD_LOGIC_VECTOR(pxMAX - 1 downto 0);
 	signal simvgaDATA	: STD_LOGIC_VECTOR((pxDATASIZE * 3) - 1 downto 0);
-	signal pixelDATA	: STD_LOGIC_VECTOR((pxDATASIZE * 3) - 1 downto 0)
+	signal simpixelDATA	: STD_LOGIC_VECTOR((pxDATASIZE * 3) - 1 downto 0);
 
 	-- Komponentendeklaration
 	component pattern is
@@ -75,9 +75,11 @@ UUT: pattern port map(
 -- Testbench Input Signale
 process
 	begin
-		simEN <= '0';	simvgaTEST <= '0';	simvgaMODE <= (others => '0');	simpixelX <= (others => '0');	simpixelY <= (others => '0');	vgaDATA <= (others => '0');		wait for CLK_period * 2;
-		simEN <= '1';	simvgaTEST <= '1';	simvgaMODE <= "00";				simpixelX <= x"000"; 			simpixelY <= x"000"; 			vgaDATA <= (others => '1');		wait for CLK_period * 10;
-						simvgaTEST <= '1';	simvgaMODE <= "00";				simpixelX <= x"001"; 			simpixelY <= x"001"; 			vgaDATA <= (others => '0');		wait for CLK_period * 10;
+		simEN <= '0';	simvgaTEST <= '0';	simvgaMODE <= (others => '0');	simpixelX <= (others => '0');	simpixelY <= (others => '0');	simvgaDATA <= (others => '0');		wait for CLK_period * 2;
+		simEN <= '1';	simvgaTEST <= '1';	simvgaMODE <= "11";				simpixelX <= x"000"; 			simpixelY <= x"000"; 			simvgaDATA <= (others => '1');		wait for CLK_period * 100;
+						simvgaTEST <= '1';	simvgaMODE <= "11";				simpixelX <= x"2BC"; 			simpixelY <= x"001"; 			simvgaDATA <= (others => '0');		wait for CLK_period * 100;
+						simvgaTEST <= '1';	simvgaMODE <= "11";				simpixelX <= x"000"; 			simpixelY <= x"2BC"; 			simvgaDATA <= (others => '0');		wait for CLK_period * 100;
+						simvgaTEST <= '1';	simvgaMODE <= "11";				simpixelX <= x"2BC"; 			simpixelY <= x"2BC"; 			simvgaDATA <= (others => '0');		wait for CLK_period * 100;
 		wait;
 end process;
 
