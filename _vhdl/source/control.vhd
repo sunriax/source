@@ -39,16 +39,6 @@ entity control is
 		vgaMODE		: out STD_LOGIC_VECTOR(1 downto 0);
 		vgaPIXEL	: out STD_LOGIC_VECTOR((pxDATASIZE * 3) - 1 downto 0)
 		
-		-- Analog Signale
---		analogREAD		: out STD_LOGIC;
---		analogWRITE		: out STD_LOGIC;
---		analogADDR		: out STD_LOGIC_VECTOR(6 downto 0);
---		analogCHANNEL	:  in STD_LOGIC_VECTOR(5 downto 0);
---		analogINDATA	: out STD_LOGIC_VECTOR(15 downto 0);
---		analogOUTDATA	:  in STD_LOGIC_VECTOR(15 downto 0);
---		analogALARM		:  in STD_LOGIC_VECTOR(7 downto 0);
---		analogFREG		:  in STD_LOGIC_VECTOR(7 downto 0)
-		
 		-- Speicher Signale
 		);
 end control;
@@ -57,14 +47,18 @@ architecture Behavioral of control is
 	-- Texte
 	signal txtTITLE		: STRING(1 to 25)	:= "elmProject 2016/2017 V1.0" & CR & LF;
 	signal txtINIT		: STRING(1 to 6)	:= "[INIT]";
+	signal txtDONE		: STRING(1 to 6)	:= "[DONE]";
+	signal txtFAIL		: STRING(1 to 6)	:= "[FAIL]";
 	signal txtREGVGA	: STRING(1 to 6)	:= "[XVGA]";
+	signal txtREGADC	: STRING(1 to 6)	:= "[XADC]";
+	signal txtREGPIN	: STRING(1 to 6)	:= "[XPIN]";
 
 	-- interne UART Signale
 	signal intuartREAD		: STD_LOGIC := '0';
 	signal intuartWRITE		: STD_LOGIC := '0';
 	signal intuartINDATA	: STD_LOGIC_VECTOR(uartDATASIZE - 1 downto 0);
 	signal intuartOUTDATA	: STD_LOGIC_VECTOR(uartDATASIZE - 1 downto 0);
-
+	
 	-- intere Systemsignale
 	signal setSTRING		: boolean := false;
 	signal selectSTRING		: integer range 0 to 24 := 0;
@@ -78,11 +72,43 @@ architecture Behavioral of control is
 	signal adcINIT			: boolean := false;
 	signal gpioINIT			: boolean := false;
 	
+	
+	
+	-- UART GET/SET Signale
+	signal procSET	:	boolean := false;
+	signal dataSET	:	STD_LOGIC_VECTOR(7 downto 0);
+	signal procGET	:	boolean := false;
+	signal dataGET	:	STD_LOGIC_VECTOR(7 downto 0);
+	
+	
+	
 begin
 
 	uartWRITE	<= '0' WHEN EN = '0' ELSE intuartWRITE;
 	uartREAD	<= '0' WHEN EN = '0' ELSE intuartREAD;
 	uartOUTDATA	<= (others => '0') WHEN EN = '0' ELSE intuartOUTDATA;
+
+
+PROC_SET:	process(CLK, EN, RESET)
+					variable dataCHAR	: STD_LOGIC_VECTOR(7 downto 0);
+				begin
+					if(EN = '0' or RESET ='0') Then
+					
+						dataCHAR := (others => '0');
+						
+						procSET	<= false;
+						dataSET <= (others => '0');
+						
+					elsif(rising_edge(CLK)) Then
+					
+						if(procSET = true) Then
+						
+							
+						
+						end if;
+						
+					end if;
+			end process;
 
 
 UART_SET:	process(CLK, EN, RESET, uartFREG)

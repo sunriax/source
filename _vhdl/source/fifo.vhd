@@ -20,7 +20,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity fifo is
 	Generic	(
-			constant SYS_CLK	: integer range 0 to 100000000 := 100000000;	-- 100 MHz Systemtakt
+			constant SYS_CLK	: integer range 0 to 200000000 := 100000000;	-- 100 MHz Systemtakt
 			constant FIFO_ADDR	: integer range 0 to 1024		:= 128;			-- Speicherbreite (Byte)
 			constant FIFO_DATA	: integer range 0 to 8			:= 8			-- Datenbreite (Bit)
 			);
